@@ -4,9 +4,7 @@ plugins {
 
 android {
     namespace 'com.mastersoft.fitpulse'
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.mastersoft.fitpulse"
@@ -33,7 +31,13 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    implementation(libs.material3.android)
+    implementation "androidx.core:core-splashscreen:1.0.1"
 }
