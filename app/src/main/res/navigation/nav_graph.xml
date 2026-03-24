@@ -23,4 +23,10 @@
         android:label="History"
         tools:layout="@layout/fragment_history" />
 
+    <fragment
+        android:id="@+id/nav_checkin"
+        android:name="com.mastersoft.fitpulse.fragment.CheckInFragment"
+        android:label="Check In"
+        tools:layout="@layout/fragment_check_in" />
+
 </navigation>

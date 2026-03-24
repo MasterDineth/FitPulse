@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_day_card.xml
+    Reusable card for each day in the "This Week" attendance row.
+
+    States driven from CheckInFragment.java:
+      • ATTENDED   → colorPrimary background   + check icon
+      • TODAY      → colorSecondaryContainer   + pin/dot icon
+      • FUTURE     → colorSurfaceContainerLow  + dot icon  (dimmed)
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dayCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardElevation="0dp"
+    android:clickable="false"
+    android:focusable="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingHorizontal="4dp">
+
+        <!-- Day abbreviation e.g. Mon, Tue … -->
+        <TextView
+            android:id="@+id/tvDayLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Status icon: check ✓ / pin 📍 / dot · -->
+        <ImageView
+            android:id="@+id/ivDayStatus"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_day_dot"
+            app:tint="?attr/colorOnSurfaceVariant"
+            android:contentDescription="attendance status" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

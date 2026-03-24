@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.mastersoft.fitpulse.R;
 import com.mastersoft.fitpulse.activity.MainActivity;
@@ -26,7 +27,13 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // "See all →" in Workout History section → switch to History tab
+        // ── Check-In button → open CheckInFragment ───────────────────────────
+        View btnCheckIn = view.findViewById(R.id.btnCheckIn);
+        if (btnCheckIn != null) {
+            btnCheckIn.setOnClickListener(v -> navigateToCheckIn(v));
+        }
+
+        // ── "See all →" workout history → switch to History tab ──────────────
         View tvSeeAllHistory = view.findViewById(R.id.tvSeeAllHistory);
         if (tvSeeAllHistory != null) {
             tvSeeAllHistory.setOnClickListener(v -> {
@@ -36,28 +43,33 @@ public class HomeFragment extends Fragment {
             });
         }
 
-        // "See all →" in Schedules section — extend as needed
+        // ── Settings button ───────────────────────────────────────────────────
+        View btnSettings = view.findViewById(R.id.btnSettings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                // TODO: open Settings screen
+            });
+        }
+
+        // ── "See all →" schedules ─────────────────────────────────────────────
         View tvSeeAllSchedules = view.findViewById(R.id.tvSeeAllSchedules);
         if (tvSeeAllSchedules != null) {
             tvSeeAllSchedules.setOnClickListener(v -> {
                 // TODO: navigate to Schedules screen
             });
         }
+    }
 
-        // Check-In button
-        View btnCheckIn = view.findViewById(R.id.btnCheckIn);
-        if (btnCheckIn != null) {
-            btnCheckIn.setOnClickListener(v -> {
-                // TODO: handle check-in action
-            });
-        }
+    // ── Navigation ────────────────────────────────────────────────────────────
 
-        // Settings button
-        View btnSettings = view.findViewById(R.id.btnSettings);
-        if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> {
-                // TODO: open Settings screen
-            });
+    private void navigateToCheckIn(View view) {
+        // Using Navigation Component instead of manual fragment transaction
+        try {
+            Navigation.findNavController(view).navigate(R.id.nav_checkin);
+        } catch (IllegalArgumentException e) {
+            // Fallback if nav_checkin is not in the graph, or if preferred manually
+            // but the previous code used a non-existent container ID.
+            // For now, we assume nav_checkin exists or should be added to the graph.
         }
     }
 }
