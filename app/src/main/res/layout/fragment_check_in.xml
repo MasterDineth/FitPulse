@@ -15,6 +15,16 @@
         android:paddingTop="20dp"
         android:paddingBottom="100dp">
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBack"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginBottom="8dp"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconTint="?attr/colorOnSurface"
+            android:backgroundTint="@android:color/transparent" />
+
         <!-- Page Title -->
         <TextView
             android:layout_width="wrap_content"

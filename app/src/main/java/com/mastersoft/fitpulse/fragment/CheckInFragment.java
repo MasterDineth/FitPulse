@@ -16,6 +16,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
@@ -53,18 +54,29 @@ public class CheckInFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Back button
+        View btnBack = view.findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+        }
+
         // ── QR code generation ───────────────────────────────────────────────
         ImageView ivQrCode               = view.findViewById(R.id.ivQrCode);
         CircularProgressIndicator loader = view.findViewById(R.id.qrLoadingIndicator);
 
-        generateQrCode(ivQrCode, loader);
+        if (ivQrCode != null && loader != null) {
+            generateQrCode(ivQrCode, loader);
+        }
 
         // ── Manual check-in button ───────────────────────────────────────────
-        view.findViewById(R.id.btnManualCheckIn).setOnClickListener(v ->
-                Snackbar.make(view, "Check-in recorded!", Snackbar.LENGTH_SHORT)
-                        .setAnchorView(v)
-                        .show()
-        );
+        View btnManualCheckIn = view.findViewById(R.id.btnManualCheckIn);
+        if (btnManualCheckIn != null) {
+            btnManualCheckIn.setOnClickListener(v ->
+                    Snackbar.make(view, "Check-in recorded!", Snackbar.LENGTH_SHORT)
+                            .setAnchorView(v)
+                            .show()
+            );
+        }
 
         // ── Week calendar ────────────────────────────────────────────────────
         int[] dayIncludeIds = {
@@ -91,11 +103,13 @@ public class CheckInFragment extends Fragment {
 
         for (int i = 0; i < dayIncludeIds.length; i++) {
             View dayView = view.findViewById(dayIncludeIds[i]);
-            applyDayState(dayView, dayLabels[i], attendanceStates[i]);
+            if (dayView != null) {
+                applyDayState(dayView, dayLabels[i], attendanceStates[i]);
+            }
         }
     }
 
-    private void generateQrCode(ImageView ivQrCode, CircularProgressIndicator loader) {
+    private void generateQrCode(@NonNull ImageView ivQrCode, @NonNull CircularProgressIndicator loader) {
         loader.setVisibility(View.VISIBLE);
         ivQrCode.setVisibility(View.INVISIBLE);
 

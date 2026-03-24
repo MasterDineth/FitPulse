@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
-import com.google.android.material.transition.MaterialElevationScale;
-import com.google.android.material.transition.MaterialSharedAxis;
 import com.mastersoft.fitpulse.activity.MainActivity;
 
 public class HomeFragment extends Fragment {
@@ -66,45 +65,15 @@ public class HomeFragment extends Fragment {
 
     // ── Navigation ────────────────────────────────────────────────────────────
 
-    /**
-     * Opens ProfileFragment with a MaterialElevationScale transition so the
-     * avatar card appears to "expand" into the full profile screen.
-     */
     private void navigateToProfile(View sharedElement) {
-        ProfileFragment profileFragment = ProfileFragment.newInstance();
-
-        // Exit current fragment with scale-down
-        setExitTransition(new MaterialElevationScale(false));
-        setReenterTransition(new MaterialElevationScale(true));
-
-        // Profile enters with scale-up
-        profileFragment.setEnterTransition(new MaterialElevationScale(true));
-        profileFragment.setReturnTransition(new MaterialElevationScale(false));
-
-        requireActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment, profileFragment, "profile")
-                .addToBackStack("profile")
-                .commit();
+        Navigation.findNavController(sharedElement).navigate(R.id.nav_profile);
     }
 
-    /**
-     * Opens CheckInFragment with a forward Z-axis push transition.
-     */
     private void navigateToCheckIn() {
-        CheckInFragment checkInFragment = CheckInFragment.newInstance();
+        Navigation.findNavController(requireView()).navigate(R.id.nav_checkin);
+    }
 
-        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, true));
-        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
-        checkInFragment.setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, true));
-        checkInFragment.setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
-
-        requireActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment, checkInFragment, "checkin")
-                .addToBackStack("checkin")
-                .commit();
+    private void navigateToSettings() {
+        Navigation.findNavController(requireView()).navigate(R.id.nav_settings);
     }
 }
