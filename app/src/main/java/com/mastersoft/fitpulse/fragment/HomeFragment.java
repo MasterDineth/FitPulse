@@ -1,5 +1,7 @@
 package com.mastersoft.fitpulse.fragment;
+
 import com.mastersoft.fitpulse.R;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,19 +50,29 @@ public class HomeFragment extends Fragment {
             });
         }
 
-        // ── Settings button → open ProfileFragment ────────────────────────────
+        // open settings fragment
         View btnSettings = view.findViewById(R.id.btnSettings);
         if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> navigateToProfile(v));
+            btnSettings.setOnClickListener(v -> navigateToSettings());
         }
 
-        // ── "See all →" schedules ─────────────────────────────────────────────
-        View tvSeeAllSchedules = view.findViewById(R.id.tvSeeAllSchedules);
-        if (tvSeeAllSchedules != null) {
-            tvSeeAllSchedules.setOnClickListener(v -> {
-                // TODO: navigate to Schedules screen
+        // open stats fragment
+        View seeAllStats = view.findViewById(R.id.seeAllStats);
+        if (seeAllStats != null) {
+            seeAllStats.setOnClickListener(v -> {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).navigateTo(R.id.nav_stats);
+                }
             });
         }
+        //open see tutorials
+        View seeAllTutorials = view.findViewById(R.id.seeAllTutorials);
+        navigateTo(seeAllTutorials,R.id.nav_tutorials);
+
+        //open all schedules
+        View seeAllSchedules = view.findViewById(R.id.tvSeeAllSchedules);
+        navigateTo(seeAllSchedules,R.id.nav_schedule);
+
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
@@ -76,4 +88,16 @@ public class HomeFragment extends Fragment {
     private void navigateToSettings() {
         Navigation.findNavController(requireView()).navigate(R.id.nav_settings);
     }
+
+    private void navigateTo(View view,int fragment){
+
+        if (view != null) {
+            view.setOnClickListener(v -> {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).navigateTo(fragment);
+                }
+            });
+        }
+    }
+
 }
