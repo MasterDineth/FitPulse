@@ -42,7 +42,12 @@ dependencies {
     implementation libs.core.splashscreen
     implementation libs.zxing.android.embedded
     implementation libs.core
-
+    implementation libs.zxing.android.embedded
+    implementation libs.core
+    implementation libs.material.v1120
+    implementation libs.core.splashscreen
+    implementation libs.glide
+    annotationProcessor libs.glide.compiler
 
 
 }
