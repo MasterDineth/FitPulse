@@ -57,4 +57,21 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="Theme.FitPulse.Splash" parent="Theme.SplashScreen">
+
+        <!-- Background shown in the system splash window on Android 12+ -->
+        <item name="windowSplashScreenBackground">?attr/colorSurface</item>
+
+        <!-- The icon displayed in the centre of the system splash window -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_pulse</item>
+
+        <!-- Icon background tint (Android 12+) -->
+        <item name="windowSplashScreenIconBackgroundColor">?attr/colorPrimaryContainer</item>
+
+        <!-- Transition to the real Activity theme once the splash is dismissed -->
+        <item name="postSplashScreenTheme">@style/Theme.FitPulse</item>
+
+    </style>
+
 </resources>
