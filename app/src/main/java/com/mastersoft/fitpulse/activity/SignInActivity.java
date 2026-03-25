@@ -14,7 +14,11 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
+
+
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -22,10 +26,16 @@ public class SignInActivity extends AppCompatActivity {
     private TextInputEditText etEmail, etPassword;
     private LinearProgressIndicator signInProgress;
 
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         bindViews();
         setupEntranceAnimations();
@@ -68,7 +78,7 @@ public class SignInActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SignUpActivity.class)));
     }
 
-    // ── Sign-in logic ─────────────────────────────────────────────────────────
+    // ign-in logic
 
     private void attemptSignIn() {
         // Clear previous errors
@@ -104,15 +114,33 @@ public class SignInActivity extends AppCompatActivity {
         setLoadingState(true);
 
         // TODO: replace with real auth call (Firebase Auth / your backend)
+        // Firebase Auth Sign In
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    setLoadingState(false);
+                    if (task.isSuccessful()) {
+                        // On success — navigate to MainActivity and clear back stack
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    } else {
+                        // If sign in fails, display a message to the user
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Authentication failed";
+                        android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
         // Simulated 1.5s network delay:
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            setLoadingState(false);
-            // On success — navigate to MainActivity and clear back stack
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }, 1500);
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+//            setLoadingState(false);
+//            // On success — navigate to MainActivity and clear back stack
+//            Intent intent = new Intent(this, MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        }, 1500);
     }
 
     private void setLoadingState(boolean loading) {

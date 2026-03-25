@@ -185,10 +185,17 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /** Navigate to MainActivity and finish this activity. */
+//    private void launchMain() {
+//        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+//        startActivity(intent);
+//        // Material-style fade transition into main
+//        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        finish();
+//    }
+
     private void launchMain() {
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intent = new Intent(SplashActivity.this, SignInActivity.class);
         startActivity(intent);
-        // Material-style fade transition into main
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
     }
