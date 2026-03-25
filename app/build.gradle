@@ -49,9 +49,11 @@ dependencies {
     implementation libs.core.splashscreen
     implementation libs.glide
     annotationProcessor libs.glide.compiler
+
     implementation platform(libs.firebase.bom)
     implementation libs.firebase.analytics
-
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-firestore'
+    implementation libs.firebase.auth
+    implementation libs.firebase.firestore
+    implementation platform(libs.firebase.bom.v3310)
+    implementation libs.gson
 }
