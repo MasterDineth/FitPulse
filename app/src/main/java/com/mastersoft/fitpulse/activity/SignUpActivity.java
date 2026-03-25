@@ -8,6 +8,11 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -16,6 +21,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -26,17 +34,23 @@ public class SignUpActivity extends AppCompatActivity {
     private View strengthBar1, strengthBar2, strengthBar3, strengthBar4;
     private android.widget.TextView tvPasswordStrengthLabel;
 
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         bindViews();
         setupPasswordStrengthWatcher();
         setupClickListeners();
     }
 
-    // ── View binding ──────────────────────────────────────────────────────────
+    // View binding
 
     private void bindViews() {
         tilUsername        = findViewById(R.id.tilUsername);
@@ -60,8 +74,7 @@ public class SignUpActivity extends AppCompatActivity {
         tvPasswordStrengthLabel = findViewById(R.id.tvPasswordStrengthLabel);
     }
 
-    // ── Password strength ─────────────────────────────────────────────────────
-
+    //Password strength
     private void setupPasswordStrengthWatcher() {
         etPassword.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
@@ -108,7 +121,7 @@ public class SignUpActivity extends AppCompatActivity {
                 ContextCompat.getColor(this, colors[strength - 1]));
     }
 
-    // ── Click listeners ───────────────────────────────────────────────────────
+    //  Click listeners
 
     private void setupClickListeners() {
         // Create Account
@@ -121,7 +134,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    // ── Sign-up logic ─────────────────────────────────────────────────────────
+    // Sign-up logic
 
     private void attemptSignUp() {
         // Clear errors
@@ -187,18 +200,48 @@ public class SignUpActivity extends AppCompatActivity {
         // Show loading
         setLoadingState(true);
 
-        // TODO: replace with real registration call (Firebase / your backend)
-        // Simulated 2s network delay:
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            setLoadingState(false);
-            showSuccessAndRedirect(email);
-        }, 2000);
+        // Frirebase User Reggistration  Part
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // save userdata after account is created
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            saveUserProfile(user.getUid(), username, email, mobile);
+                        }
+                    } else {
+                        // Auth failed
+                        setLoadingState(false);
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Authentication failed";
+                        Toast.makeText(SignUpActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void saveUserProfile(String uid, String username, String email, String mobile) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", username);
+        userMap.put("email", email);
+        userMap.put("mobile", mobile);
+        // You can add fields like "role" (e.g., "member", "trainer") or "joinDate" here later
+
+        db.collection("users").document(uid)
+                .set(userMap)
+                .addOnSuccessListener(aVoid -> {
+                    // Both Auth and Database write are successful
+                    setLoadingState(false);
+                    showSuccessAndRedirect(email);
+                })
+                .addOnFailureListener(e -> {
+                    setLoadingState(false);
+                    Toast.makeText(SignUpActivity.this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
     /** Shows a success dialog then navigates back to Sign In. */
     private void showSuccessAndRedirect(String email) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Account Created! 🎉")
+                .setTitle("Account Created!")
                 .setMessage("Your FitPulse account has been created successfully.\n\nSign in to start your fitness journey!")
                 .setPositiveButton("Sign In Now", (dialog, which) -> {
                     // Navigate to SignIn and clear back stack so pressing back doesn't return here
