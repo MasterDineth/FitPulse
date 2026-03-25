@@ -5,4 +5,5 @@
     <string name="attendance">Attendance</string>
     <string name="check_in">Check In</string>
     <string name="check_in_today_s">Check in today\'s</string>
+    <string name="no_workout_history">No Workout History!\n</string>
 </resources>
