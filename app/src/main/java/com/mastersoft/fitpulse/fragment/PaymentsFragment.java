@@ -1,4 +1,6 @@
 package com.mastersoft.fitpulse.fragment;
+import static com.google.android.material.internal.ViewUtils.dpToPx;
+
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -168,7 +170,7 @@ public class PaymentsFragment extends Fragment {
         card.setStrokeColor(
                 ContextCompat.getColor(requireContext(),
                         com.google.android.material.R.color.material_dynamic_primary40));
-        card.setStrokeWidth(dpToPx(2));
+//        card.setStrokeWidth(dpToPx(2));
         card.setCardBackgroundColor(ColorStateList.valueOf(
                 ContextCompat.getColor(requireContext(),
                         com.google.android.material.R.color.material_dynamic_primary90)));
@@ -365,49 +367,49 @@ public class PaymentsFragment extends Fragment {
 //        request.city           = "Colombo";
 //        request.country        = "Sri Lanka";
 
-        InitRequest req = new InitRequest();
-        req.setMerchantId("1210XXX");       // Merchant ID
-        req.setCurrency("LKR");             // Currency code LKR/USD/GBP/EUR/AUD
-        req.setAmount(1000.00);             // Final Amount to be charged
-        req.setOrderId("230000123");        // Unique Reference ID
-        req.setItemsDescription("Door bell wireless");  // Item description title
-        req.setCustom1("This is the custom message 1");
-        req.setCustom2("This is the custom message 2");
-        req.getCustomer().setFirstName("Saman");
-        req.getCustomer().setLastName("Perera");
-        req.getCustomer().setEmail("samanp@gmail.com");
-        req.getCustomer().setPhone("+94771234567");
-        req.getCustomer().getAddress().setAddress("No.1, Galle Road");
-        req.getCustomer().getAddress().setCity("Colombo");
-        req.getCustomer().getAddress().setCountry("Sri Lanka");
-
-        Intent intent = new Intent(PaymentsFragment.this, PHMainActivity.class);
-        intent.putExtra(PHConstants.INTENT_EXTRA_DATA, req);
-        PHConfigs.setBaseUrl(PHConfigs.SANDBOX_URL);
-        startActivityForResult(intent, PAYHERE_REQUEST);
-
-
-        // Add one item
-        Item item = new Item(
-                pendingOrderId,
-                selectedPlan.getName() + " Membership",
-                1,
-                selectedPlan.getAmount());
-        request.addItem(item);
-
-        // Generate hash using your merchant secret
-        // IMPORTANT: In production, generate this hash on your server to keep the secret safe.
-        // This is shown here for completeness; do NOT embed merchant secret in production APKs.
-        String hash = generateHash(request);
-        request.hash = hash;
-
-        // Launch PayHere
-        Intent intent = new Intent(requireContext(), PHMainActivity.class);
-        intent.putExtra(PHConstants.INTENT_EXTRA_DATA, request);
-        PHConfigs.setBaseUrl(PAYHERE_ENDPOINT);
-        startActivityForResult(intent, PAYHERE_REQUEST_CODE);
-
-        setProcessingState(true, "Opening payment gateway…");
+//        InitRequest req = new InitRequest();
+//        req.setMerchantId("1210XXX");       // Merchant ID
+//        req.setCurrency("LKR");             // Currency code LKR/USD/GBP/EUR/AUD
+//        req.setAmount(1000.00);             // Final Amount to be charged
+//        req.setOrderId("230000123");        // Unique Reference ID
+//        req.setItemsDescription("Door bell wireless");  // Item description title
+//        req.setCustom1("This is the custom message 1");
+//        req.setCustom2("This is the custom message 2");
+//        req.getCustomer().setFirstName("Saman");
+//        req.getCustomer().setLastName("Perera");
+//        req.getCustomer().setEmail("samanp@gmail.com");
+//        req.getCustomer().setPhone("+94771234567");
+//        req.getCustomer().getAddress().setAddress("No.1, Galle Road");
+//        req.getCustomer().getAddress().setCity("Colombo");
+//        req.getCustomer().getAddress().setCountry("Sri Lanka");
+//
+//        Intent intent = new Intent(PaymentsFragment.this, PHMainActivity.class);
+//        intent.putExtra(PHConstants.INTENT_EXTRA_DATA, req);
+//        PHConfigs.setBaseUrl(PHConfigs.SANDBOX_URL);
+//        startActivityForResult(intent, PAYHERE_REQUEST);
+//
+//
+//        // Add one item
+//        Item item = new Item(
+//                pendingOrderId,
+//                selectedPlan.getName() + " Membership",
+//                1,
+//                selectedPlan.getAmount());
+//        request.addItem(item);
+//
+//        // Generate hash using your merchant secret
+//        // IMPORTANT: In production, generate this hash on your server to keep the secret safe.
+//        // This is shown here for completeness; do NOT embed merchant secret in production APKs.
+//        String hash = generateHash(request);
+//        request.hash = hash;
+//
+//        // Launch PayHere
+//        Intent intent = new Intent(requireContext(), PHMainActivity.class);
+//        intent.putExtra(PHConstants.INTENT_EXTRA_DATA, request);
+//        PHConfigs.setBaseUrl(PAYHERE_ENDPOINT);
+//        startActivityForResult(intent, PAYHERE_REQUEST_CODE);
+//
+//        setProcessingState(true, "Opening payment gateway…");
     }
 
     /**
@@ -419,20 +421,20 @@ public class PaymentsFragment extends Fragment {
      * SECURITY NOTE: In a production app, generate this hash server-side and
      * return it to the app. Never embed merchant_secret in the APK.
      */
-    private String generateHash(InitRequest request) {
-        try {
-            String secretHash = md5(PAYHERE_MERCHANT_SECRET).toUpperCase();
-            String amountFormatted = String.format(java.util.Locale.US, "%.2f", request.amount);
-            String rawString = PAYHERE_MERCHANT_ID
-                    + request.orderId
-                    + amountFormatted
-                    + request.currency
-                    + secretHash;
-            return md5(rawString).toUpperCase();
-        } catch (Exception e) {
-            return "";
-        }
-    }
+//    private String generateHash(InitRequest request) {
+//        try {
+//            String secretHash = md5(PAYHERE_MERCHANT_SECRET).toUpperCase();
+//            String amountFormatted = String.format(java.util.Locale.US, "%.2f", request.amount);
+//            String rawString = PAYHERE_MERCHANT_ID
+//                    + request.orderId
+//                    + amountFormatted
+//                    + request.currency
+//                    + secretHash;
+//            return md5(rawString).toUpperCase();
+//        } catch (Exception e) {
+//            return "";
+//        }
+//    }
 
     private String md5(String input) throws Exception {
         java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -444,93 +446,93 @@ public class PaymentsFragment extends Fragment {
 
     // ── PayHere callback ──────────────────────────────────────────────────────
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (requestCode != PAYHERE_REQUEST_CODE || data == null) return;
+//
+//        setProcessingState(false, "");
+//
+//        PHResponse<StatusResponse> response =
+//                (PHResponse<StatusResponse>) data.getSerializableExtra(
+//                        PHConstants.INTENT_EXTRA_RESULT);
+//
+//        if (response == null) {
+//            showPaymentResult(false, "Payment cancelled", null);
+//            return;
+//        }
 
-        if (requestCode != PAYHERE_REQUEST_CODE || data == null) return;
+//        StatusResponse sr         = response.getData();
+//        String paymentId          = sr != null ? sr.getPaymentId()  : "";
+//        String paymentMethod      = sr != null ? sr.getPaymentMethod() : "Card";
+//        String returnedStatus     = sr != null ? sr.getStatusMessage() : "";
+//        boolean success           = response.isSuccess();
 
-        setProcessingState(false, "");
-
-        PHResponse<StatusResponse> response =
-                (PHResponse<StatusResponse>) data.getSerializableExtra(
-                        PHConstants.INTENT_EXTRA_RESULT);
-
-        if (response == null) {
-            showPaymentResult(false, "Payment cancelled", null);
-            return;
-        }
-
-        StatusResponse sr         = response.getData();
-        String paymentId          = sr != null ? sr.getPaymentId()  : "";
-        String paymentMethod      = sr != null ? sr.getPaymentMethod() : "Card";
-        String returnedStatus     = sr != null ? sr.getStatusMessage() : "";
-        boolean success           = response.isSuccess();
-
-        String firestoreStatus = success ? "SUCCESS" : "FAILED";
-
-        // Save to Firebase
-        setProcessingState(true, success ? "Saving payment…" : "Recording failed payment…");
-
-        PaymentRepository.getInstance()
-                .savePayment(
-                        pendingOrderId,
-                        paymentId,
-                        selectedPlan,
-                        paymentMethod,
-                        firestoreStatus,
-                        new PaymentRepository.SaveCallback() {
-                            @Override
-                            public void onSuccess() {
-                                if (getContext() == null) return;
-                                setProcessingState(false, "");
-                                showPaymentResult(success, returnedStatus, paymentId);
-                                // Refresh the UI
-                                loadMembershipStatus();
-                                loadPaymentHistory();
-                            }
-
-                            @Override
-                            public void onFailure(Exception e) {
-                                if (getContext() == null) return;
-                                setProcessingState(false, "");
-                                Snackbar.make(requireView(),
-                                        "Payment recorded but sync failed. Retry later.",
-                                        Snackbar.LENGTH_LONG).show();
-                                loadPaymentHistory();
-                            }
-                        });
-    }
-
-    private void showPaymentResult(boolean success, String message, String paymentId) {
-        String title   = success ? "Payment Successful 🎉" : "Payment Failed";
-        String detail  = success
-                ? "Your " + selectedPlan.getName() + " membership is now active.\n"
-                + "Payment ID: " + paymentId
-                : "Payment could not be processed.\n" + message
-                + "\nPlease try again.";
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(title)
-                .setMessage(detail)
-                .setPositiveButton("OK", null)
-                .show();
-    }
-
-    // ── UI helpers ────────────────────────────────────────────────────────────
-
-    private void setProcessingState(boolean processing, String message) {
-        cardProcessing.setVisibility(processing ? View.VISIBLE : View.GONE);
-        if (processing && tvProcessingMessage != null) {
-            tvProcessingMessage.setText(message);
-        }
-        btnMakePayment.setEnabled(!processing);
-        cardBasic.setClickable(!processing);
-        cardPro.setClickable(!processing);
-        cardElite.setClickable(!processing);
-    }
-
-    private int dpToPx(int dp) {
-        return (int) (dp * requireContext().getResources().getDisplayMetrics().density);
-    }
+//        String firestoreStatus = success ? "SUCCESS" : "FAILED";
+//
+//        // Save to Firebase
+//        setProcessingState(true, success ? "Saving payment…" : "Recording failed payment…");
+//
+//        PaymentRepository.getInstance()
+//                .savePayment(
+//                        pendingOrderId,
+//                        paymentId,
+//                        selectedPlan,
+//                        paymentMethod,
+//                        firestoreStatus,
+//                        new PaymentRepository.SaveCallback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                if (getContext() == null) return;
+//                                setProcessingState(false, "");
+//                                showPaymentResult(success, returnedStatus, paymentId);
+//                                // Refresh the UI
+//                                loadMembershipStatus();
+//                                loadPaymentHistory();
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Exception e) {
+//                                if (getContext() == null) return;
+//                                setProcessingState(false, "");
+//                                Snackbar.make(requireView(),
+//                                        "Payment recorded but sync failed. Retry later.",
+//                                        Snackbar.LENGTH_LONG).show();
+//                                loadPaymentHistory();
+//                            }
+//                        });
+//    }
+//
+//    private void showPaymentResult(boolean success, String message, String paymentId) {
+//        String title   = success ? "Payment Successful 🎉" : "Payment Failed";
+//        String detail  = success
+//                ? "Your " + selectedPlan.getName() + " membership is now active.\n"
+//                + "Payment ID: " + paymentId
+//                : "Payment could not be processed.\n" + message
+//                + "\nPlease try again.";
+//
+//        new MaterialAlertDialogBuilder(requireContext())
+//                .setTitle(title)
+//                .setMessage(detail)
+//                .setPositiveButton("OK", null)
+//                .show();
+//    }
+//
+//    // ── UI helpers ────────────────────────────────────────────────────────────
+//
+//    private void setProcessingState(boolean processing, String message) {
+//        cardProcessing.setVisibility(processing ? View.VISIBLE : View.GONE);
+//        if (processing && tvProcessingMessage != null) {
+//            tvProcessingMessage.setText(message);
+//        }
+//        btnMakePayment.setEnabled(!processing);
+//        cardBasic.setClickable(!processing);
+//        cardPro.setClickable(!processing);
+//        cardElite.setClickable(!processing);
+//    }
+//
+//    private int dpToPx(int dp) {
+//        return (int) (dp * requireContext().getResources().getDisplayMetrics().density);
+//    }
 }
