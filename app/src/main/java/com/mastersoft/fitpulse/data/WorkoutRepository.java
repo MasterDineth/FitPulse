@@ -1,4 +1,4 @@
-package com.mastersoft.fitpulse.model;
+package com.mastersoft.fitpulse.data;
 
 
 import android.content.Context;

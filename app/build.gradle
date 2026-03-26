@@ -7,6 +7,7 @@ android {
     namespace 'com.mastersoft.fitpulse'
     compileSdk 36
 
+
     defaultConfig {
         applicationId "com.mastersoft.fitpulse"
         minSdk 33
@@ -16,6 +17,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
 
     buildTypes {
         release {
@@ -56,4 +63,8 @@ dependencies {
     implementation libs.firebase.firestore
     implementation platform(libs.firebase.bom.v3310)
     implementation libs.gson
+
+    implementation libs.payheredevs.payhere.android.sdk
+    implementation libs.payheredevs.payhere.android.sdk
+    implementation libs.appcompat.v160
 }

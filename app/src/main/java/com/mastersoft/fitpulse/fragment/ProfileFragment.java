@@ -29,11 +29,17 @@ public class ProfileFragment extends Fragment {
 
     // Edit mode flags
     private boolean isEditingPersonal = false;
+    private boolean isEditingBilling  = false;
     private boolean isEditingFitness  = false;
 
     // Views — personal
     private TextInputEditText etFullName, etPhone, etDob;
     private View layoutEditActions;
+
+    //billing
+    private TextInputEditText etAddress;
+    private AutoCompleteTextView actvCity, actvCountry;
+    private View layoutBillingActions;
 
     // Views — fitness
     private TextInputEditText etWeight, etHeight;
@@ -45,6 +51,7 @@ public class ProfileFragment extends Fragment {
     private ActivityResultLauncher<Intent> photoPickerLauncher;
     private ShapeableImageView ivAvatar;
 
+
     // Dropdown option arrays
     private static final String[] GOALS = {
             "Muscle Gain", "Weight Loss", "Endurance", "Flexibility", "General Fitness"
@@ -54,6 +61,12 @@ public class ProfileFragment extends Fragment {
     };
     private static final String[] WORKOUT_TYPES = {
             "Strength Training", "Cardio", "HIIT", "Yoga", "CrossFit", "Mixed"
+    };
+    private static final String[] CITIES = {
+            "Colombo", "Kandy", "Galle", "Gampaha", "Negombo", "Jaffna", "Kurunegala"
+    };
+    private static final String[] COUNTRIES = {
+            "Sri Lanka", "India", "Australia", "United Kingdom", "United States"
     };
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -83,6 +96,7 @@ public class ProfileFragment extends Fragment {
         setupPhotoPicker(view);
         setupNavigation(view);
         setupSignOut(view);
+        setupBillingEdit(view);
     }
 
     @Override
@@ -164,6 +178,11 @@ public class ProfileFragment extends Fragment {
         actvWorkoutType      = view.findViewById(R.id.actvWorkoutType);
         layoutFitnessActions = view.findViewById(R.id.layoutFitnessActions);
         chipBmi              = view.findViewById(R.id.chipBmi);
+        // Billing Views
+        etAddress            = view.findViewById(R.id.etAddress);
+        actvCity             = view.findViewById(R.id.actvCity);
+        actvCountry          = view.findViewById(R.id.actvCountry);
+        layoutBillingActions = view.findViewById(R.id.layoutBillingActions);
     }
 
     // ── Dropdown adapters ─────────────────────────────────────────────────────
@@ -176,6 +195,11 @@ public class ProfileFragment extends Fragment {
                 requireContext(), android.R.layout.simple_dropdown_item_1line, ACTIVITY_LEVELS));
         actvWorkoutType.setAdapter(new ArrayAdapter<>(
                 requireContext(), android.R.layout.simple_dropdown_item_1line, WORKOUT_TYPES));
+        // Billing Adapters
+        actvCity.setAdapter(new ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_dropdown_item_1line, CITIES));
+        actvCountry.setAdapter(new ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_dropdown_item_1line, COUNTRIES));
     }
 
     // ── Personal info edit ────────────────────────────────────────────────────
@@ -262,6 +286,42 @@ public class ProfileFragment extends Fragment {
         actvActivityLevel.setFocusable(enabled);
         actvWorkoutType.setEnabled(enabled);
         actvWorkoutType.setFocusable(enabled);
+    }
+
+    //billing data edit
+
+    // ── Billing data edit ─────────────────────────────────────────────────────
+
+    private void setupBillingEdit(View view) {
+        view.findViewById(R.id.btnEditBilling).setOnClickListener(v -> enterBillingEdit());
+        view.findViewById(R.id.btnCancelBilling).setOnClickListener(v -> exitBillingEdit(false));
+        view.findViewById(R.id.btnSaveBilling).setOnClickListener(v -> exitBillingEdit(true));
+    }
+
+    private void enterBillingEdit() {
+        isEditingBilling = true;
+        setBillingFieldsEnabled(true);
+        layoutBillingActions.setVisibility(View.VISIBLE);
+        layoutBillingActions.setAlpha(0f);
+        layoutBillingActions.animate().alpha(1f).setDuration(250).start();
+    }
+
+    private void exitBillingEdit(boolean save) {
+        if (save) Snackbar.make(requireView(), "Billing info updated", Snackbar.LENGTH_SHORT).show();
+        isEditingBilling = false;
+        setBillingFieldsEnabled(false);
+        layoutBillingActions.animate().alpha(0f).setDuration(200)
+                .withEndAction(() -> layoutBillingActions.setVisibility(View.GONE)).start();
+    }
+
+    private void setBillingFieldsEnabled(boolean enabled) {
+        etAddress.setEnabled(enabled);
+
+        actvCity.setEnabled(enabled);
+        actvCity.setFocusable(enabled);
+
+        actvCountry.setEnabled(enabled);
+        actvCountry.setFocusable(enabled);
     }
 
     private void updateBmiChip() {

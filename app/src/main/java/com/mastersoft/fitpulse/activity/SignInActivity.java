@@ -1,6 +1,7 @@
 package com.mastersoft.fitpulse.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -78,7 +79,7 @@ public class SignInActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SignUpActivity.class)));
     }
 
-    // ign-in logic
+    // sign-in logic
 
     private void attemptSignIn() {
         // Clear previous errors
@@ -120,6 +121,14 @@ public class SignInActivity extends AppCompatActivity {
                     setLoadingState(false);
                     if (task.isSuccessful()) {
                         // On success — navigate to MainActivity and clear back stack
+
+                        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                        editor.putBoolean("isLoggedIn", true);
+                        // save user to the shared preferences
+                        editor.apply();
+
                         Intent intent = new Intent(this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -130,17 +139,6 @@ public class SignInActivity extends AppCompatActivity {
                         android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_LONG).show();
                     }
                 });
-
-
-        // Simulated 1.5s network delay:
-//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//            setLoadingState(false);
-//            // On success — navigate to MainActivity and clear back stack
-//            Intent intent = new Intent(this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(intent);
-//            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-//        }, 1500);
     }
 
     private void setLoadingState(boolean loading) {

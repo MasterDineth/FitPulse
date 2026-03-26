@@ -1,7 +1,5 @@
 package com.mastersoft.fitpulse.fragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.res.ColorStateList;
@@ -20,8 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.mastersoft.fitpulse.R;
-import com.mastersoft.fitpulse.model.WorkoutHistoryRepository;
-import com.mastersoft.fitpulse.model.WorkoutRepository;
+import com.mastersoft.fitpulse.data.WorkoutHistoryRepository;
+import com.mastersoft.fitpulse.data.WorkoutRepository;
 import com.mastersoft.fitpulse.model.WorkoutPlan;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;

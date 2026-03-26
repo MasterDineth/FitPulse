@@ -32,12 +32,14 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginBottom="20dp" />
 
-        <!-- Membership Status Card -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!--  MEMBERSHIP STATUS CARD                                        -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMembershipStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             app:cardCornerRadius="24dp"
             app:cardBackgroundColor="?attr/colorPrimary"
             app:cardElevation="0dp">
@@ -73,28 +75,40 @@
                             android:id="@+id/tvMembershipStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Active"
+                            android:text="Loading…"
                             android:textAppearance="?attr/textAppearanceTitleLarge"
                             android:textColor="?attr/colorOnPrimary"
                             android:textStyle="bold" />
 
                         <ImageView
+                            android:id="@+id/ivStatusIcon"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_check_circle"
                             android:layout_marginStart="6dp"
-                            app:tint="?attr/colorOnPrimary" />
+                            app:tint="?attr/colorOnPrimary"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvRenewalDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Renews: June 23, 2025"
+                        android:text=""
                         android:textAppearance="?attr/textAppearanceLabelSmall"
                         android:textColor="?attr/colorOnPrimary"
                         android:alpha="0.8"
                         android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvCurrentPlanName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:alpha="0.7"
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -116,7 +130,7 @@
                         android:id="@+id/tvCurrentPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rs 5000"
+                        android:text="Rs —"
                         android:textAppearance="?attr/textAppearanceHeadlineLarge"
                         android:textColor="?attr/colorOnPrimary"
                         android:textStyle="bold" />
@@ -133,7 +147,59 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Choose Plan Label -->
+        <!-- ── Make Payment button ─────────────────────────────────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMakePayment"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="28dp"
+            android:text="Make Payment"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_payment"
+            app:iconGravity="textStart"
+            app:iconSize="20dp" />
+
+        <!-- Processing card (GONE by default) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardProcessing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+            app:cardElevation="0dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:indeterminate="true"
+                    app:indicatorSize="24dp"
+                    app:trackThickness="3dp"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
+                    android:layout_marginEnd="12dp" />
+                <TextView
+                    android:id="@+id/tvProcessingMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Processing payment…"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!--  CHOOSE PLAN                                                   -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -143,7 +209,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="12dp" />
 
-        <!-- Basic Plan Card -->
+        <!-- Basic Plan -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPlanBasic"
             android:layout_width="match_parent"
@@ -152,7 +218,8 @@
             app:cardCornerRadius="20dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@android:color/transparent"
             android:clickable="true"
             android:focusable="true">
 
@@ -162,6 +229,14 @@
                 android:orientation="horizontal"
                 android:padding="18dp"
                 android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivSelectBasic"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_radio_unchecked"
+                    android:layout_marginEnd="12dp"
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -202,16 +277,17 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Pro Plan Card (Active/Selected) -->
+        <!-- Pro Plan -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPlanPro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@android:color/transparent"
             android:clickable="true"
             android:focusable="true">
 
@@ -221,6 +297,14 @@
                 android:orientation="horizontal"
                 android:padding="18dp"
                 android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivSelectPro"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_radio_unchecked"
+                    android:layout_marginEnd="12dp"
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -239,15 +323,20 @@
                             android:layout_height="wrap_content"
                             android:text="Pro"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="?attr/colorOnSecondaryContainer"
+                            android:textColor="?attr/colorOnSurface"
                             android:textStyle="bold" />
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_check"
-                            android:layout_marginStart="4dp"
-                            app:tint="?attr/colorOnSecondaryContainer" />
+                        <com.google.android.material.chip.Chip
+                            android:layout_width="wrap_content"
+                            android:layout_height="24dp"
+                            android:text="Popular"
+                            android:layout_marginStart="6dp"
+                            app:chipBackgroundColor="?attr/colorPrimaryContainer"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:clickable="false"
+                            android:focusable="false"
+                            app:chipMinHeight="20dp"
+                            android:textAppearance="?attr/textAppearanceLabelSmall" />
                     </LinearLayout>
 
                     <TextView
@@ -255,7 +344,7 @@
                         android:layout_height="wrap_content"
                         android:text="All Basic · QR Check-In · Stats"
                         android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSecondaryContainer" />
+                        android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
                 <TextView
@@ -263,7 +352,7 @@
                     android:layout_height="wrap_content"
                     android:text="Rs 5000"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSecondaryContainer"
+                    android:textColor="?attr/colorPrimary"
                     android:textStyle="bold" />
 
                 <TextView
@@ -271,12 +360,11 @@
                     android:layout_height="wrap_content"
                     android:text="/mo"
                     android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="?attr/colorOnSecondaryContainer"
-                    android:alpha="0.7" />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Elite Plan Card -->
+        <!-- Elite Plan -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPlanElite"
             android:layout_width="match_parent"
@@ -285,7 +373,8 @@
             app:cardCornerRadius="20dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@android:color/transparent"
             android:clickable="true"
             android:focusable="true">
 
@@ -295,6 +384,14 @@
                 android:orientation="horizontal"
                 android:padding="18dp"
                 android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivSelectElite"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_radio_unchecked"
+                    android:layout_marginEnd="12dp"
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -335,215 +432,54 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Payment History Label -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!--  PAYMENT HISTORY                                               -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Payment History"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/historyLoadingIndicator"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorSize="20dp"
+                app:trackThickness="2dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="?attr/colorSurfaceContainerHighest" />
+        </LinearLayout>
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Payment History"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Payment History Item 1 -->
-        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tvHistoryEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardElevation="0dp">
+            android:text="No payment history yet."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:gravity="center"
+            android:visibility="gone"
+            android:paddingVertical="16dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="18dp"
-                android:gravity="center_vertical">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="May 2025"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pro Membership"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="end">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rs 5000"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.chip.Chip
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Paid"
-                        android:layout_marginTop="4dp"
-                        app:chipBackgroundColor="?attr/colorTertiaryContainer"
-                        android:textColor="?attr/colorOnTertiaryContainer"
-                        app:chipMinHeight="24dp"
-                        android:textAppearance="?attr/textAppearanceLabelSmall"
-                        android:clickable="false"
-                        android:focusable="false" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Payment History Item 2 -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Dynamically populated payment history items -->
+        <LinearLayout
+            android:id="@+id/layoutPaymentHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="18dp"
-                android:gravity="center_vertical">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Apr 2025"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pro Membership"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="end">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rs 5000"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.chip.Chip
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Paid"
-                        android:layout_marginTop="4dp"
-                        app:chipBackgroundColor="?attr/colorTertiaryContainer"
-                        android:textColor="?attr/colorOnTertiaryContainer"
-                        app:chipMinHeight="24dp"
-                        android:textAppearance="?attr/textAppearanceLabelSmall"
-                        android:clickable="false"
-                        android:focusable="false" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Payment History Item 3 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="18dp"
-                android:gravity="center_vertical">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mar 2025"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pro Membership"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="end">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rs 5000"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.chip.Chip
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Paid"
-                        android:layout_marginTop="4dp"
-                        app:chipBackgroundColor="?attr/colorTertiaryContainer"
-                        android:textColor="?attr/colorOnTertiaryContainer"
-                        app:chipMinHeight="24dp"
-                        android:textAppearance="?attr/textAppearanceLabelSmall"
-                        android:clickable="false"
-                        android:focusable="false" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            android:orientation="vertical" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

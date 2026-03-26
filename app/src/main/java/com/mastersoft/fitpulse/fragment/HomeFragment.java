@@ -202,7 +202,9 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
         // See all → Schedule tab
         navigateTo(view.findViewById(R.id.tvSeeAllSchedules), R.id.nav_schedule);
+
     }
+
 
     // ─────────────────────────────────────────────────────────────────────────
     //  Feature 1 — Calendar card
@@ -412,7 +414,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
                     String name = null;
                     if (snapshot.exists()) {
-                        name = snapshot.getString("displayName");
+                        name = snapshot.getString("username");
                         if (name == null || name.isEmpty()) {
                             name = snapshot.getString("firstName"); // alternate field
                         }
@@ -454,17 +456,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     //  Navigation helpers
     // ─────────────────────────────────────────────────────────────────────────
 
-    private void navigateToProfile(View sharedElement) {
-        Navigation.findNavController(sharedElement).navigate(R.id.nav_profile);
-    }
 
-    private void navigateToCheckIn() {
-        Navigation.findNavController(requireView()).navigate(R.id.nav_checkin);
-    }
-
-    private void navigateToSettings() {
-        Navigation.findNavController(requireView()).navigate(R.id.nav_settings);
-    }
 
     /** Switches the bottom-nav tab via MainActivity. */
     private void switchTab(int navId) {
@@ -478,6 +470,18 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         if (view != null) {
             view.setOnClickListener(v -> switchTab(navId));
         }
+    }
+
+    private void navigateToProfile(View sharedElement) {
+        Navigation.findNavController(sharedElement).navigate(R.id.nav_profile);
+    }
+
+    private void navigateToCheckIn() {
+        Navigation.findNavController(requireView()).navigate(R.id.nav_checkin);
+    }
+
+    private void navigateToSettings() {
+        Navigation.findNavController(requireView()).navigate(R.id.nav_settings);
     }
 
     //request permission
