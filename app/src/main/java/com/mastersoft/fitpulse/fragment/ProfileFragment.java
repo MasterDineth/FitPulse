@@ -1,7 +1,9 @@
 package com.mastersoft.fitpulse.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,6 +27,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
 
@@ -38,31 +41,30 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private String userId;
 
+    // Local Storage
+    private static final String PREFS_NAME = "UserProfileCache";
+    private SharedPreferences sharedPreferences;
+
     // Edit mode flags
     private boolean isEditingPersonal = false;
     private boolean isEditingBilling = false;
     private boolean isEditingFitness = false;
 
-    // Views — personal
+    // Views
     private TextInputEditText etFullName, etPhone, etDob;
-
     private TextView tvProfileName;
     private View layoutEditActions;
-
-    // Views — billing
     private TextInputEditText etAddress;
     private AutoCompleteTextView actvCity, actvCountry;
     private View layoutBillingActions;
-
-    // Views — fitness
     private TextInputEditText etWeight, etHeight;
     private AutoCompleteTextView actvFitnessGoal, actvActivityLevel, actvWorkoutType;
     private View layoutFitnessActions;
     private TextView chipBmi;
+    private ShapeableImageView ivAvatar;
 
     // Photo picker launcher
     private ActivityResultLauncher<Intent> photoPickerLauncher;
-    private ShapeableImageView ivAvatar;
 
     // Dropdown option arrays
     private static final String[] GOALS = {"Muscle Gain", "Weight Loss", "Endurance", "Flexibility", "General Fitness"};
@@ -70,8 +72,6 @@ public class ProfileFragment extends Fragment {
     private static final String[] WORKOUT_TYPES = {"Strength Training", "Cardio", "HIIT", "Yoga", "CrossFit", "Mixed"};
     private static final String[] CITIES = {"Colombo", "Kandy", "Galle", "Gampaha", "Negombo", "Jaffna", "Kurunegala"};
     private static final String[] COUNTRIES = {"Sri Lanka", "India", "Australia", "United Kingdom", "United States"};
-
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +81,7 @@ public class ProfileFragment extends Fragment {
         if (mAuth.getCurrentUser() != null) {
             userId = mAuth.getCurrentUser().getUid();
         }
+        sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         registerPhotoPickerLauncher();
     }
 
@@ -96,87 +97,94 @@ public class ProfileFragment extends Fragment {
         hideBottomNav();
         bindViews(view);
         setupDropdowns();
-        loadUserData(); // Fetch initial data from Firestore
+
+        // 1. Load from local cache immediately for offline/speed
+        loadFromLocal();
+
+        // 2. If local cache is empty, fetch from Firebase
+        if (!sharedPreferences.contains("username")) {
+            loadUserDataFromFirestore();
+        }
 
         setupPersonalInfoEdit(view);
         setupBillingEdit(view);
         setupFitnessEdit(view);
-
         setupPhotoPicker(view);
         setupNavigation(view);
         setupSignOut(view);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        showBottomNav();
+    // ── DATA HANDLING (Local + Remote) ────────────────────────────────────────
+
+    private void loadFromLocal() {
+        if (tvProfileName != null) tvProfileName.setText(sharedPreferences.getString("username", "User"));
+        etFullName.setText(sharedPreferences.getString("fullName", ""));
+        etDob.setText(sharedPreferences.getString("dob", ""));
+        etPhone.setText(sharedPreferences.getString("mobile", ""));
+        etAddress.setText(sharedPreferences.getString("address", ""));
+        actvCity.setText(sharedPreferences.getString("city", ""), false);
+        actvCountry.setText(sharedPreferences.getString("country", ""), false);
+        etWeight.setText(sharedPreferences.getString("weight", ""));
+        etHeight.setText(sharedPreferences.getString("height", ""));
+        actvFitnessGoal.setText(sharedPreferences.getString("fitnessGoal", ""), false);
+        actvActivityLevel.setText(sharedPreferences.getString("activityLevel", ""), false);
+        actvWorkoutType.setText(sharedPreferences.getString("workoutType", ""), false);
+        updateBmiChip();
     }
 
-    // ── Data Loading ──────────────────────────────────────────────────────────
+    private void saveToLocal(Map<String, Object> data) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (entry.getValue() != null) {
+                editor.putString(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        editor.apply();
+    }
 
-    private void loadUserData() {
+    private void loadUserDataFromFirestore() {
         if (userId == null) return;
 
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-
-                        if (tvProfileName != null) {
-                            tvProfileName.setText(documentSnapshot.getString("username"));
-                        }
-
-                        // Personal
-                        etFullName.setText(documentSnapshot.getString("fullName"));
-                        etDob.setText(documentSnapshot.getString("dob"));
-                        etPhone.setText(documentSnapshot.getString("mobile")); // Mapping 'mobile' field from DB
-
-                        // Billing
-                        etAddress.setText(documentSnapshot.getString("address"));
-                        actvCity.setText(documentSnapshot.getString("city"), false);
-                        actvCountry.setText(documentSnapshot.getString("country"), false);
-
-                        // Fitness
-                        etWeight.setText(documentSnapshot.getString("weight"));
-                        etHeight.setText(documentSnapshot.getString("height"));
-                        actvFitnessGoal.setText(documentSnapshot.getString("fitnessGoal"), false);
-                        actvActivityLevel.setText(documentSnapshot.getString("activityLevel"), false);
-                        actvWorkoutType.setText(documentSnapshot.getString("workoutType"), false);
-
-                        updateBmiChip();
+                        syncFirestoreToLocal(documentSnapshot);
+                        loadFromLocal(); // Refresh UI from the newly updated local cache
                     }
                 })
-                .addOnFailureListener(e -> Snackbar.make(requireView(), "Error loading profile", Snackbar.LENGTH_LONG).show());
+                .addOnFailureListener(e -> Snackbar.make(requireView(), "Error syncing profile", Snackbar.LENGTH_LONG).show());
     }
 
-    // ── Update Logic (Modular) ────────────────────────────────────────────────
+    private void syncFirestoreToLocal(DocumentSnapshot doc) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("username", doc.getString("username"));
+        data.put("fullName", doc.getString("fullName"));
+        data.put("dob", doc.getString("dob"));
+        data.put("mobile", doc.getString("mobile"));
+        data.put("address", doc.getString("address"));
+        data.put("city", doc.getString("city"));
+        data.put("country", doc.getString("country"));
+        data.put("weight", doc.getString("weight"));
+        data.put("height", doc.getString("height"));
+        data.put("fitnessGoal", doc.getString("fitnessGoal"));
+        data.put("activityLevel", doc.getString("activityLevel"));
+        data.put("workoutType", doc.getString("workoutType"));
+        saveToLocal(data);
+    }
 
     private void saveSectionToFirestore(Map<String, Object> data, String sectionName) {
         if (userId == null) return;
 
         db.collection("users").document(userId)
-                .update(data) // Surgical update: only affects keys present in 'data'
-                .addOnSuccessListener(aVoid -> Snackbar.make(requireView(), sectionName + " updated", Snackbar.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Snackbar.make(requireView(), "Failed to save " + sectionName, Snackbar.LENGTH_SHORT).show());
+                .update(data)
+                .addOnSuccessListener(aVoid -> {
+                    saveToLocal(data); // Sync local cache immediately after cloud success
+                    Snackbar.make(requireView(), sectionName + " saved", Snackbar.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Snackbar.make(requireView(), "Update failed (Check connection)", Snackbar.LENGTH_SHORT).show());
     }
 
-    // ── Personal Info ─────────────────────────────────────────────────────────
-
-    private void setupPersonalInfoEdit(View view) {
-        view.findViewById(R.id.btnEditPersonal).setOnClickListener(v -> enterPersonalEdit());
-        view.findViewById(R.id.btnCancelEdit).setOnClickListener(v -> exitPersonalEdit(false));
-        view.findViewById(R.id.btnSavePersonal).setOnClickListener(v -> exitPersonalEdit(true));
-        if (etDob != null) etDob.setOnClickListener(v -> {
-            if (isEditingPersonal) showDatePicker();
-        });
-    }
-
-    private void enterPersonalEdit() {
-        isEditingPersonal = true;
-        etFullName.setEnabled(true);
-        etDob.setEnabled(true);
-        toggleActionsVisibility(layoutEditActions, true);
-    }
+    // ── SECTION UPDATES ───────────────────────────────────────────────────────
 
     private void exitPersonalEdit(boolean save) {
         if (save) {
@@ -184,25 +192,13 @@ public class ProfileFragment extends Fragment {
             data.put("fullName", etFullName.getText().toString().trim());
             data.put("dob", etDob.getText().toString().trim());
             saveSectionToFirestore(data, "Personal info");
+        } else {
+            loadFromLocal(); // Revert to local cache if cancelled
         }
         isEditingPersonal = false;
         etFullName.setEnabled(false);
         etDob.setEnabled(false);
         toggleActionsVisibility(layoutEditActions, false);
-    }
-
-    // ── Billing Info ──────────────────────────────────────────────────────────
-
-    private void setupBillingEdit(View view) {
-        view.findViewById(R.id.btnEditBilling).setOnClickListener(v -> enterBillingEdit());
-        view.findViewById(R.id.btnCancelBilling).setOnClickListener(v -> exitBillingEdit(false));
-        view.findViewById(R.id.btnSaveBilling).setOnClickListener(v -> exitBillingEdit(true));
-    }
-
-    private void enterBillingEdit() {
-        isEditingBilling = true;
-        setBillingFieldsEnabled(true);
-        toggleActionsVisibility(layoutBillingActions, true);
     }
 
     private void exitBillingEdit(boolean save) {
@@ -212,44 +208,12 @@ public class ProfileFragment extends Fragment {
             data.put("city", actvCity.getText().toString().trim());
             data.put("country", actvCountry.getText().toString().trim());
             saveSectionToFirestore(data, "Billing data");
+        } else {
+            loadFromLocal();
         }
         isEditingBilling = false;
         setBillingFieldsEnabled(false);
         toggleActionsVisibility(layoutBillingActions, false);
-    }
-
-    private void setBillingFieldsEnabled(boolean enabled) {
-        etAddress.setEnabled(enabled);
-        actvCity.setEnabled(enabled);
-        actvCountry.setEnabled(enabled);
-    }
-
-    // ── Fitness Info ──────────────────────────────────────────────────────────
-
-    private void setupFitnessEdit(View view) {
-        view.findViewById(R.id.btnEditFitness).setOnClickListener(v -> enterFitnessEdit());
-        view.findViewById(R.id.btnCancelFitness).setOnClickListener(v -> exitFitnessEdit(false));
-        view.findViewById(R.id.btnSaveFitness).setOnClickListener(v -> exitFitnessEdit(true));
-
-        android.text.TextWatcher bmiWatcher = new android.text.TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
-            }
-
-            public void onTextChanged(CharSequence s, int st, int b, int c) {
-            }
-
-            public void afterTextChanged(android.text.Editable s) {
-                updateBmiChip();
-            }
-        };
-        etWeight.addTextChangedListener(bmiWatcher);
-        etHeight.addTextChangedListener(bmiWatcher);
-    }
-
-    private void enterFitnessEdit() {
-        isEditingFitness = true;
-        setFitnessFieldsEnabled(true);
-        toggleActionsVisibility(layoutFitnessActions, true);
     }
 
     private void exitFitnessEdit(boolean save) {
@@ -261,10 +225,77 @@ public class ProfileFragment extends Fragment {
             data.put("activityLevel", actvActivityLevel.getText().toString().trim());
             data.put("workoutType", actvWorkoutType.getText().toString().trim());
             saveSectionToFirestore(data, "Fitness data");
+        } else {
+            loadFromLocal();
         }
         isEditingFitness = false;
         setFitnessFieldsEnabled(false);
         toggleActionsVisibility(layoutFitnessActions, false);
+    }
+
+    // ── REMAINING LOGIC (UI, Nav, Helper) ────────────────────────────────────
+
+    private void setupSignOut(View view) {
+        View btnSignOut = view.findViewById(R.id.btnSignOut);
+        if (btnSignOut != null) {
+            btnSignOut.setOnClickListener(v ->
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Sign Out")
+                            .setMessage("Sign out will clear local profile data.")
+                            .setPositiveButton("Sign Out", (dialog, which) -> {
+                                sharedPreferences.edit().clear().apply(); // Clear cache
+                                mAuth.signOut();
+                                // Add navigation to Login screen here
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show());
+        }
+    }
+
+    private void setupPersonalInfoEdit(View view) {
+        view.findViewById(R.id.btnEditPersonal).setOnClickListener(v -> {
+            isEditingPersonal = true;
+            etFullName.setEnabled(true);
+            etDob.setEnabled(true);
+            toggleActionsVisibility(layoutEditActions, true);
+        });
+        view.findViewById(R.id.btnCancelEdit).setOnClickListener(v -> exitPersonalEdit(false));
+        view.findViewById(R.id.btnSavePersonal).setOnClickListener(v -> exitPersonalEdit(true));
+        if (etDob != null) etDob.setOnClickListener(v -> { if (isEditingPersonal) showDatePicker(); });
+    }
+
+    private void setupBillingEdit(View view) {
+        view.findViewById(R.id.btnEditBilling).setOnClickListener(v -> {
+            isEditingBilling = true;
+            setBillingFieldsEnabled(true);
+            toggleActionsVisibility(layoutBillingActions, true);
+        });
+        view.findViewById(R.id.btnCancelBilling).setOnClickListener(v -> exitBillingEdit(false));
+        view.findViewById(R.id.btnSaveBilling).setOnClickListener(v -> exitBillingEdit(true));
+    }
+
+    private void setupFitnessEdit(View view) {
+        view.findViewById(R.id.btnEditFitness).setOnClickListener(v -> {
+            isEditingFitness = true;
+            setFitnessFieldsEnabled(true);
+            toggleActionsVisibility(layoutFitnessActions, true);
+        });
+        view.findViewById(R.id.btnCancelFitness).setOnClickListener(v -> exitFitnessEdit(false));
+        view.findViewById(R.id.btnSaveFitness).setOnClickListener(v -> exitFitnessEdit(true));
+
+        android.text.TextWatcher bmiWatcher = new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            public void onTextChanged(CharSequence s, int st, int b, int c) {}
+            public void afterTextChanged(android.text.Editable s) { updateBmiChip(); }
+        };
+        etWeight.addTextChangedListener(bmiWatcher);
+        etHeight.addTextChangedListener(bmiWatcher);
+    }
+
+    private void setBillingFieldsEnabled(boolean enabled) {
+        etAddress.setEnabled(enabled);
+        actvCity.setEnabled(enabled);
+        actvCountry.setEnabled(enabled);
     }
 
     private void setFitnessFieldsEnabled(boolean enabled) {
@@ -275,20 +306,16 @@ public class ProfileFragment extends Fragment {
         actvWorkoutType.setEnabled(enabled);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private void updateBmiChip() {
         try {
             double w = Double.parseDouble(etWeight.getText().toString().trim());
             double h = Double.parseDouble(etHeight.getText().toString().trim());
             if (h <= 0) return;
-            // BMI Formula: weight / height^2
             double bmi = w / ((h / 100.0) * (h / 100.0));
             if (chipBmi != null) {
                 chipBmi.setText(String.format(java.util.Locale.getDefault(), "%.1f · %s", bmi, bmiCategory(bmi)));
             }
-        } catch (NumberFormatException ignored) {
-        }
+        } catch (NumberFormatException ignored) {}
     }
 
     private String bmiCategory(double bmi) {
@@ -316,7 +343,6 @@ public class ProfileFragment extends Fragment {
         etPhone = view.findViewById(R.id.etPhone);
         etDob = view.findViewById(R.id.etDob);
         layoutEditActions = view.findViewById(R.id.layoutEditActions);
-
         etWeight = view.findViewById(R.id.etWeight);
         etHeight = view.findViewById(R.id.etHeight);
         actvFitnessGoal = view.findViewById(R.id.actvFitnessGoal);
@@ -324,7 +350,6 @@ public class ProfileFragment extends Fragment {
         actvWorkoutType = view.findViewById(R.id.actvWorkoutType);
         layoutFitnessActions = view.findViewById(R.id.layoutFitnessActions);
         chipBmi = view.findViewById(R.id.chipBmi);
-
         etAddress = view.findViewById(R.id.etAddress);
         actvCity = view.findViewById(R.id.actvCity);
         actvCountry = view.findViewById(R.id.actvCountry);
@@ -350,40 +375,13 @@ public class ProfileFragment extends Fragment {
         datePicker.show(getChildFragmentManager(), "DOB_PICKER");
     }
 
-    private void setupSignOut(View view) {
-        View btnSignOut = view.findViewById(R.id.btnSignOut);
-        if (btnSignOut != null) {
-            btnSignOut.setOnClickListener(v ->
-                    new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Sign Out")
-                            .setMessage("Are you sure you want to sign out?")
-                            .setPositiveButton("Sign Out", (dialog, which) -> {
-                                mAuth.signOut();
-                                // Navigate to login
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show());
-        }
-    }
-
-    private void hideBottomNav() {
-        if (getActivity() != null) {
-            View nav = getActivity().findViewById(R.id.bottom_navigation);
-            if (nav != null) nav.setVisibility(View.GONE);
-        }
-    }
-
-    private void showBottomNav() {
-        if (getActivity() != null) {
-            View nav = getActivity().findViewById(R.id.bottom_navigation);
-            if (nav != null) nav.setVisibility(View.VISIBLE);
-        }
-    }
+    private void hideBottomNav() { if (getActivity() != null) { View nav = getActivity().findViewById(R.id.bottom_navigation); if (nav != null) nav.setVisibility(View.GONE); } }
+    private void showBottomNav() { if (getActivity() != null) { View nav = getActivity().findViewById(R.id.bottom_navigation); if (nav != null) nav.setVisibility(View.VISIBLE); } }
 
     private void registerPhotoPickerLauncher() {
         photoPickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                loadAvatarFromUri(result.getData().getData());
+                if (ivAvatar != null) Glide.with(requireContext()).load(result.getData().getData()).circleCrop().into(ivAvatar);
             }
         });
     }
@@ -401,20 +399,10 @@ public class ProfileFragment extends Fragment {
         photoPickerLauncher.launch(Intent.createChooser(intent, "Select profile photo"));
     }
 
-    private void loadAvatarFromUri(Uri uri) {
-        if (ivAvatar != null) {
-            Glide.with(requireContext()).load(uri).circleCrop().into(ivAvatar);
-        }
-    }
-
     private void setupNavigation(View view) {
         View btnBack = view.findViewById(R.id.btnBack);
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
-        }
+        if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
     }
 
-    public static ProfileFragment newInstance() {
-        return new ProfileFragment();
-    }
+    public static ProfileFragment newInstance() { return new ProfileFragment(); }
 }
