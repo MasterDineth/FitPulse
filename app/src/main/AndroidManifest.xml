@@ -26,10 +26,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FitPulse">
 
-        <activity
-            android:name="lk.payhere.androidsdk.PHMainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+<!--        <activity-->
+<!--            android:name="lk.payhere.androidsdk.PHMainActivity"-->
+<!--            android:exported="false"-->
+<!--            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />-->
 
         <activity
             android:name=".activity.ResetPasswordActivity"
