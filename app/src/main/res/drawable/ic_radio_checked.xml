@@ -1,0 +1,18 @@
+<!-- Save as ic_radio_checked.xml in res/drawable/ -->
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
+    <!-- Outer ring -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:pathData="M11,20A9,9 0,1,0 11,2A9,9 0,0,0 11,20Z"/>
+    <!-- Inner filled circle -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M11,7.5A3.5,3.5 0,1,0 11,14.5A3.5,3.5 0,0,0 11,7.5Z"/>
+</vector>
