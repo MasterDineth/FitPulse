@@ -2,16 +2,17 @@ package com.mastersoft.fitpulse.fragment;
 
 import com.mastersoft.fitpulse.R;
 import com.mastersoft.fitpulse.activity.MainActivity;
-import com.mastersoft.fitpulse.adapter.WorkoutHistoryAdapter;
 import com.mastersoft.fitpulse.model.WorkoutSession;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,9 +21,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -39,28 +41,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import com.mastersoft.fitpulse.model.StepCounterHelper;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
 
-    private static final int ACTIVITY_RECOGNITION_REQUEST_CODE = 100;
     private static final String TAG = "HomeFragment";
 
     // ── Daily step / calorie targets ─────────────────────────────────────────
     private static final int    STEP_GOAL     = 10_000;
     private static final int    CALORIE_GOAL  = 700;
-    /**
-     * MET-based estimate: average stride ≈ 0.762 m, 70 kg person.
-     * Calories = steps × 0.04   (simplified from MET formula; override as needed)
-     */
     private static final double CALORIES_PER_STEP = 0.04;
 
-    // ── Sensor ────────────────────────────────────────────────────────────────
+    // ── Sensor & Local Storage ────────────────────────────────────────────────
     private SensorManager sensorManager;
     private Sensor        stepCounterSensor;
-    /** Raw cumulative total reported by TYPE_STEP_COUNTER since last reboot. */
-    private float stepsAtBoot       = -1f;   // first reading captured this session
-    private int   stepsThisSession  = 0;     // steps walked since fragment started
+    private SharedPreferences stepPrefs;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     // ── Firebase ──────────────────────────────────────────────────────────────
     private FirebaseFirestore db;
@@ -75,7 +70,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private TextView                tvCalories;
     private LinearProgressIndicator progressSteps;
     private LinearProgressIndicator progressCalories;
-    private LinearLayout            llWorkoutHistory;   // dynamic host container
+    private LinearLayout            llWorkoutHistory;
 
     // ── Workout history ───────────────────────────────────────────────────────
     private final List<WorkoutSession> workoutSessions = new ArrayList<>();
@@ -83,6 +78,23 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     // ─────────────────────────────────────────────────────────────────────────
     //  Lifecycle
     // ─────────────────────────────────────────────────────────────────────────
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Register the permission launcher in onCreate
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        registerStepSensor();
+                    } else {
+                        Log.w(TAG, "Activity recognition permission denied.");
+                    }
+                }
+        );
+    }
 
     @Nullable
     @Override
@@ -96,9 +108,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Firebase
+        // Firebase & Storage
         db   = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        stepPrefs = requireActivity().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
 
         // Sensor
         sensorManager    = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
@@ -107,16 +120,19 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         bindViews(view);
         wireNavigation(view);
 
-        // ── Feature implementations ───────────────────────────────────────────
+        // Feature implementations
         updateCalendarCard();
         loadUserGreeting();
         loadWorkoutHistory();
+
+        // Load immediately from local storage so the UI isn't blank while waiting for the user to take a step
+        loadInitialStepData();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        registerStepSensor();
+        checkAndRequestPermission();
     }
 
     @Override
@@ -141,17 +157,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         progressCalories  = root.findViewById(R.id.progressCalories);
         llWorkoutHistory  = root.findViewById(R.id.llWorkoutHistory);
 
-        // The month label does not have an id in the XML — we locate it by its
-        // sibling relationship: it is the first TextView inside the calendar card's
-        // inner LinearLayout.  We assign it a tag so we can update it safely.
         View calendarCard = root.findViewById(R.id.cardCheckIn);
         if (calendarCard != null) {
             tvMonthName = calendarCard.findViewWithTag("tvMonthName");
             if (tvMonthName == null) {
-                // Locate by position: the calendar inner card → LinearLayout → child 0
-                // Structure: cardCheckIn > LinearLayout[h] > cardView > LinearLayout[v]
-                //            > TextView(month)[0], TextView(date)[1], TextView(day)[2]
-                // We'll use the parent of tvDateNumber
                 if (tvDateNumber != null) {
                     ViewGroup parent = (ViewGroup) tvDateNumber.getParent();
                     if (parent != null && parent.getChildCount() > 0) {
@@ -165,97 +174,67 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Navigation wiring  (unchanged from original)
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void wireNavigation(View view) {
-        // Avatar → Profile
         View ivAvatar = view.findViewById(R.id.ivAvatar);
-        if (ivAvatar != null) {
-            ivAvatar.setOnClickListener(v -> navigateToProfile(v));
-        }
+        if (ivAvatar != null) ivAvatar.setOnClickListener(this::navigateToProfile);
 
-        // Check-In button
         View btnCheckIn = view.findViewById(R.id.btnCheckIn);
-        if (btnCheckIn != null) {
-            btnCheckIn.setOnClickListener(v -> navigateToCheckIn());
-        }
+        if (btnCheckIn != null) btnCheckIn.setOnClickListener(v -> navigateToCheckIn());
 
-        // See all → History tab
         View tvSeeAllHistory = view.findViewById(R.id.tvSeeAllHistory);
-        if (tvSeeAllHistory != null) {
-            tvSeeAllHistory.setOnClickListener(v -> switchTab(R.id.nav_history));
-        }
+        if (tvSeeAllHistory != null) tvSeeAllHistory.setOnClickListener(v -> switchTab(R.id.nav_history));
 
-        // Settings
         View btnSettings = view.findViewById(R.id.btnSettings);
-        if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> navigateToSettings());
-        }
+        if (btnSettings != null) btnSettings.setOnClickListener(v -> navigateToSettings());
 
-        // See all → Stats tab
         navigateTo(view.findViewById(R.id.seeAllStats), R.id.nav_stats);
-
-        // See all → Tutorials tab
         navigateTo(view.findViewById(R.id.seeAllTutorials), R.id.nav_tutorials);
-
-        // See all → Schedule tab
         navigateTo(view.findViewById(R.id.tvSeeAllSchedules), R.id.nav_schedule);
-
     }
 
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 1 — Calendar card
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Populates the small calendar widget inside the Check-In card with the
-     * real current month (abbreviated), day-of-month (digit) and
-     * day-of-week (abbreviated).
-     *
-     * Layout reference:
-     *   tvMonthName  — e.g. "Mar"
-     *   tvDateNumber — e.g. "25"
-     *   tvDayName    — e.g. "Wed"
-     */
     private void updateCalendarCard() {
         Calendar now = Calendar.getInstance();
-
-        // Day number  (1 – 31)
-        if (tvDateNumber != null) {
-            tvDateNumber.setText(String.valueOf(now.get(Calendar.DAY_OF_MONTH)));
-        }
-
-        // Abbreviated month name  ("Jan", "Feb", … "Dec")
-        if (tvMonthName != null) {
-            String month = new SimpleDateFormat("MMM", Locale.getDefault()).format(now.getTime());
-            tvMonthName.setText(month);
-        }
-
-        // Abbreviated day name  ("Mon", "Tue", … "Sun")
-        if (tvDayName != null) {
-            String day = new SimpleDateFormat("EEE", Locale.getDefault()).format(now.getTime());
-            tvDayName.setText(day);
-        }
+        if (tvDateNumber != null) tvDateNumber.setText(String.valueOf(now.get(Calendar.DAY_OF_MONTH)));
+        if (tvMonthName != null) tvMonthName.setText(new SimpleDateFormat("MMM", Locale.getDefault()).format(now.getTime()));
+        if (tvDayName != null) tvDayName.setText(new SimpleDateFormat("EEE", Locale.getDefault()).format(now.getTime()));
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 2 — Pedometer / step counter + calorie calculation
+    //  Feature 2 — Pedometer / Step Tracking (Robust Syncing)
     // ─────────────────────────────────────────────────────────────────────────
+
+    private void checkAndRequestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION);
+            } else {
+                registerStepSensor();
+            }
+        } else {
+            // Permission automatically granted on Android 9 and below
+            registerStepSensor();
+        }
+    }
 
     private void registerStepSensor() {
         if (stepCounterSensor != null && sensorManager != null) {
-            sensorManager.registerListener(
-                    this,
-                    stepCounterSensor,
-                    SensorManager.SENSOR_DELAY_UI
-            );
+            sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
         } else {
-            // Device has no step-counter sensor — show 0 gracefully
-            updateStepDisplay(0);
             Log.w(TAG, "TYPE_STEP_COUNTER sensor not available on this device.");
+        }
+    }
+
+    private void loadInitialStepData() {
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        String savedDate = stepPrefs.getString("lastSavedDate", "");
+
+        if (todayDate.equals(savedDate)) {
+            // Load today's steps if they exist
+            updateStepDisplay(stepPrefs.getInt("savedStepsToday", 0));
+        } else {
+            // It's a new day, initialize UI at 0
+            updateStepDisplay(0);
         }
     }
 
@@ -263,67 +242,64 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() != Sensor.TYPE_STEP_COUNTER) return;
 
-        float totalSinceReboot = event.values[0];
+        float rawSteps = event.values[0];
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
 
-        // Capture baseline on first reading this session
-        if (stepsAtBoot < 0) {
-            stepsAtBoot = totalSinceReboot;
+        String savedDate = stepPrefs.getString("lastSavedDate", "");
+        int savedStepsToday = stepPrefs.getInt("savedStepsToday", 0);
+        float lastSensorValue = stepPrefs.getFloat("lastSensorValue", rawSteps);
+
+        if (!savedDate.equals(todayDate)) {
+            // It's a new day! Reset daily accumulation
+            savedStepsToday = 0;
+            lastSensorValue = rawSteps;
+        } else if (rawSteps < lastSensorValue) {
+            // The device was rebooted today, resetting the hardware sensor to 0.
+            // We keep our accumulated steps, but reset the baseline tracker.
+            lastSensorValue = rawSteps;
         }
 
-        stepsThisSession = (int) (totalSinceReboot - stepsAtBoot);
-        updateStepDisplay(stepsThisSession);
+        // Calculate steps taken since the last sensor update
+        int delta = (int) (rawSteps - lastSensorValue);
+        savedStepsToday += delta;
+        lastSensorValue = rawSteps;
+
+        // Sync continuously to local storage to prevent data loss
+        stepPrefs.edit()
+                .putString("lastSavedDate", todayDate)
+                .putInt("savedStepsToday", savedStepsToday)
+                .putFloat("lastSensorValue", lastSensorValue)
+                .apply();
+
+        updateStepDisplay(savedStepsToday);
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) { /* no-op */ }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
-    /**
-     * Pushes step count and derived calorie burn into the UI.
-     *
-     * @param steps number of steps walked since the fragment registered the sensor
-     */
     private void updateStepDisplay(int steps) {
         if (!isAdded()) return;
 
-        // Format with thousands separator
         String stepsFormatted = String.format(Locale.getDefault(), "%,d", steps);
         if (tvSteps != null) tvSteps.setText(stepsFormatted);
 
-        // Progress bar  (0 – 100)
         int stepProgress = Math.min(100, (int) ((steps / (float) STEP_GOAL) * 100));
         if (progressSteps != null) progressSteps.setProgress(stepProgress);
 
-        // Calories  (rounded to nearest integer)
         int calories = (int) Math.round(steps * CALORIES_PER_STEP);
         if (tvCalories != null) tvCalories.setText(String.valueOf(calories));
 
-        // Calories progress bar
         int calProgress = Math.min(100, (int) ((calories / (float) CALORIE_GOAL) * 100));
         if (progressCalories != null) progressCalories.setProgress(calProgress);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 3 — Workout history from Firestore
+    //  Feature 3 — Workout history
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Queries the authenticated user's workout history collection in Firestore.
-     *
-     * Expected Firestore structure:
-     *   users/{uid}/workoutHistory/{docId}
-     *     - name        : String   — workout name
-     *     - date        : Timestamp or String — workout date
-     *     - durationMin : long     — duration in minutes
-     *     - type        : String   — "upper" | "lower" | "cardio" | "fullbody" | …
-     *
-     * The 3 most-recent sessions are rendered in the history list.
-     */
     private void loadWorkoutHistory() {
         FirebaseUser user = auth.getCurrentUser();
-        if (user == null) {
-            Log.w(TAG, "No authenticated user — skipping workout history load.");
-            return;
-        }
+        if (user == null) return;
 
         db.collection("users")
                 .document(user.getUid())
@@ -342,27 +318,14 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                     }
                     renderWorkoutHistory();
                 })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to load workout history", e);
-                });
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load workout history", e));
     }
 
-    /**
-     * Dynamically inflates a workout-history row for each session and appends
-     * it to {@code llWorkoutHistory}.  The XML already contains three static
-     * placeholder cards; those are removed first so we start with a clean slate
-     * and only real data is shown.
-     *
-     * If you prefer to keep the static placeholders as skeletons while data
-     * loads, remove the {@code llWorkoutHistory.removeAllViews()} call and
-     * instead hide / show the existing children.
-     */
     private void renderWorkoutHistory() {
         if (llWorkoutHistory == null) return;
         llWorkoutHistory.removeAllViews();
 
         if (workoutSessions.isEmpty()) {
-            // Show a friendly "no history yet" message
             TextView empty = new TextView(requireContext());
             empty.setText(R.string.no_workout_history);
             empty.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
@@ -388,16 +351,9 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 4 — Greeting with logged-in user's name
+    //  Feature 4 — User Greeting
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Resolves the user's display name in this priority order:
-     *   1. Firestore profile document  (users/{uid}.displayName)  — most accurate
-     *   2. FirebaseAuth displayName    — set during sign-up / Google sign-in
-     *   3. Email local part            — fallback when no display name is stored
-     *   4. "User"                      — absolute last resort
-     */
     private void loadUserGreeting() {
         FirebaseUser firebaseUser = auth.getCurrentUser();
         if (firebaseUser == null) {
@@ -405,7 +361,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        // Try Firestore first for the richest profile data
         db.collection("users")
                 .document(firebaseUser.getUid())
                 .get()
@@ -415,37 +370,25 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                     String name = null;
                     if (snapshot.exists()) {
                         name = snapshot.getString("username");
-                        if (name == null || name.isEmpty()) {
-                            name = snapshot.getString("firstName"); // alternate field
-                        }
+                        if (name == null || name.isEmpty()) name = snapshot.getString("firstName");
                     }
 
-                    // Fallback chain
-                    if (name == null || name.isEmpty()) {
-                        name = firebaseUser.getDisplayName();
-                    }
+                    if (name == null || name.isEmpty()) name = firebaseUser.getDisplayName();
                     if (name == null || name.isEmpty()) {
                         String email = firebaseUser.getEmail();
-                        if (email != null && email.contains("@")) {
-                            name = email.substring(0, email.indexOf('@'));
-                        }
+                        if (email != null && email.contains("@")) name = email.substring(0, email.indexOf('@'));
                     }
-                    if (name == null || name.isEmpty()) {
-                        name = "User";
-                    }
+                    if (name == null || name.isEmpty()) name = "User";
 
                     setGreetingName(name);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to fetch user profile", e);
-                    // Graceful degradation: use whatever FirebaseAuth has
                     String fallback = firebaseUser.getDisplayName();
                     if (fallback == null || fallback.isEmpty()) fallback = "User";
                     setGreetingName(fallback);
                 });
     }
 
-    /** Applies the resolved name to the greeting TextView. */
     private void setGreetingName(String name) {
         if (tvUserName != null) {
             tvUserName.setText(name);
@@ -453,23 +396,17 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  Navigation helpers
+    //  Navigation logic
     // ─────────────────────────────────────────────────────────────────────────
 
-
-
-    /** Switches the bottom-nav tab via MainActivity. */
     private void switchTab(int navId) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).navigateTo(navId);
         }
     }
 
-    /** Convenience: attaches a tab-switch listener to any view by nav-graph id. */
     private void navigateTo(View view, int navId) {
-        if (view != null) {
-            view.setOnClickListener(v -> switchTab(navId));
-        }
+        if (view != null) view.setOnClickListener(v -> switchTab(navId));
     }
 
     private void navigateToProfile(View sharedElement) {
@@ -483,10 +420,4 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private void navigateToSettings() {
         Navigation.findNavController(requireView()).navigate(R.id.nav_settings);
     }
-
-    //request permission
-
-
-
-
 }

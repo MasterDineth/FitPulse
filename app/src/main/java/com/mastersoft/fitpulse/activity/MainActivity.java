@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mastersoft.fitpulse.R;
+import com.mastersoft.fitpulse.data.TutorialManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
             NavigationUI.setupWithNavController(bottomNavigationView, navController);
         }
+
+        // Inside MainActivity.java -> onCreate()
+        TutorialManager.getInstance().initialize(this);
     }
 
     public void navigateTo(int resId) {
