@@ -2,18 +2,13 @@ package com.mastersoft.fitpulse.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.mastersoft.fitpulse.R;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -21,18 +16,23 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.mastersoft.fitpulse.R;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private TextInputLayout   tilUsername, tilEmail, tilMobile, tilPassword, tilConfirmPassword;
+    private TextInputLayout tilUsername, tilEmail, tilMobile, tilPassword, tilConfirmPassword;
     private TextInputEditText etUsername, etEmail, etMobile, etPassword, etConfirmPassword;
     private LinearProgressIndicator signUpProgress;
     private View layoutPasswordStrength;
     private View strengthBar1, strengthBar2, strengthBar3, strengthBar4;
-    private android.widget.TextView tvPasswordStrengthLabel;
+    private TextView tvPasswordStrengthLabel;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -50,7 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    // View binding
+    // ── View Binding ──────────────────────────────────────────────────────────
 
     private void bindViews() {
         tilUsername        = findViewById(R.id.tilUsername);
@@ -65,16 +65,17 @@ public class SignUpActivity extends AppCompatActivity {
         etPassword        = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        signUpProgress         = findViewById(R.id.signUpProgress);
-        layoutPasswordStrength = findViewById(R.id.layoutPasswordStrength);
-        strengthBar1           = findViewById(R.id.strengthBar1);
-        strengthBar2           = findViewById(R.id.strengthBar2);
-        strengthBar3           = findViewById(R.id.strengthBar3);
-        strengthBar4           = findViewById(R.id.strengthBar4);
+        signUpProgress          = findViewById(R.id.signUpProgress);
+        layoutPasswordStrength  = findViewById(R.id.layoutPasswordStrength);
+        strengthBar1            = findViewById(R.id.strengthBar1);
+        strengthBar2            = findViewById(R.id.strengthBar2);
+        strengthBar3            = findViewById(R.id.strengthBar3);
+        strengthBar4            = findViewById(R.id.strengthBar4);
         tvPasswordStrengthLabel = findViewById(R.id.tvPasswordStrengthLabel);
     }
 
-    //Password strength
+    // ── Password Strength ─────────────────────────────────────────────────────
+
     private void setupPasswordStrengthWatcher() {
         etPassword.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
@@ -97,7 +98,7 @@ public class SignUpActivity extends AppCompatActivity {
         if (password.length() >= 8)                              score++;
         if (password.matches(".*[A-Z].*"))                       score++;
         if (password.matches(".*[0-9].*"))                       score++;
-        if (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{}].*")) score++;
+        if (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{}].*"))  score++;
         return Math.max(1, score);
     }
 
@@ -117,11 +118,10 @@ public class SignUpActivity extends AppCompatActivity {
                     : ContextCompat.getColor(this, com.google.android.material.R.color.m3_ref_palette_neutral_variant90));
         }
         tvPasswordStrengthLabel.setText(labels[strength - 1]);
-        tvPasswordStrengthLabel.setTextColor(
-                ContextCompat.getColor(this, colors[strength - 1]));
+        tvPasswordStrengthLabel.setTextColor(ContextCompat.getColor(this, colors[strength - 1]));
     }
 
-    //  Click listeners
+    // ── Click Listeners ───────────────────────────────────────────────────────
 
     private void setupClickListeners() {
         // Create Account
@@ -134,10 +134,10 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    // Sign-up logic
+    // ── Sign-up Logic ─────────────────────────────────────────────────────────
 
     private void attemptSignUp() {
-        // Clear errors
+        // Clear previous errors
         tilUsername.setError(null);
         tilEmail.setError(null);
         tilMobile.setError(null);
@@ -150,7 +150,7 @@ public class SignUpActivity extends AppCompatActivity {
         String password  = getText(etPassword);
         String confirm   = getText(etConfirmPassword);
 
-        // ── Validation ────────────────────────────────────────────────────────
+        // Validation
         if (TextUtils.isEmpty(username)) {
             tilUsername.setError("Username is required");
             tilUsername.requestFocus();
@@ -197,14 +197,14 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        // Show loading
+        // Show loading state
         setLoadingState(true);
 
-        // Frirebase User Reggistration  Part
+        // Firebase User Registration
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // save userdata after account is created
+                        // Save userdata after account is created
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
                             saveUserProfile(user.getUid(), username, email, mobile);
@@ -223,7 +223,9 @@ public class SignUpActivity extends AppCompatActivity {
         userMap.put("username", username);
         userMap.put("email", email);
         userMap.put("mobile", mobile);
-        // You can add fields like "role" (e.g., "member", "trainer") or "joinDate" here later
+
+        // Add the server timestamp for registration date
+        userMap.put("dateRegistered", FieldValue.serverTimestamp());
 
         db.collection("users").document(uid)
                 .set(userMap)
@@ -237,6 +239,8 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     /** Shows a success dialog then navigates back to Sign In. */
     private void showSuccessAndRedirect(String email) {

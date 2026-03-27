@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
+import com.mastersoft.fitpulse.activity.SignInActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class ProfileFragment extends Fragment {
     private boolean isEditingFitness = false;
 
     // Views
-    private TextInputEditText etFullName, etPhone, etDob;
-    private TextView tvProfileName;
+    private TextInputEditText etFullName, etEmail, etPhone, etDob;
+    private TextView tvProfileName,tvProfileSubtitle;
     private View layoutEditActions;
     private TextInputEditText etAddress;
     private AutoCompleteTextView actvCity, actvCountry;
@@ -118,17 +119,19 @@ public class ProfileFragment extends Fragment {
 
     private void loadFromLocal() {
         if (tvProfileName != null) tvProfileName.setText(sharedPreferences.getString("username", "User"));
-        etFullName.setText(sharedPreferences.getString("fullName", ""));
-        etDob.setText(sharedPreferences.getString("dob", ""));
-        etPhone.setText(sharedPreferences.getString("mobile", ""));
-        etAddress.setText(sharedPreferences.getString("address", ""));
-        actvCity.setText(sharedPreferences.getString("city", ""), false);
-        actvCountry.setText(sharedPreferences.getString("country", ""), false);
-        etWeight.setText(sharedPreferences.getString("weight", ""));
-        etHeight.setText(sharedPreferences.getString("height", ""));
-        actvFitnessGoal.setText(sharedPreferences.getString("fitnessGoal", ""), false);
-        actvActivityLevel.setText(sharedPreferences.getString("activityLevel", ""), false);
-        actvWorkoutType.setText(sharedPreferences.getString("workoutType", ""), false);
+        if (tvProfileSubtitle != null) tvProfileSubtitle.setText(sharedPreferences.getString("dateRegistered"+" Member · Since Jan 2026", ""));
+        if (etFullName != null) etFullName.setText(sharedPreferences.getString("fullName", ""));
+        if (etEmail != null) etEmail.setText(sharedPreferences.getString("email", ""));
+        if (etDob != null) etDob.setText(sharedPreferences.getString("dob", ""));
+        if (etPhone != null) etPhone.setText(sharedPreferences.getString("mobile", ""));
+        if (etAddress != null) etAddress.setText(sharedPreferences.getString("address", ""));
+        if (actvCity != null) actvCity.setText(sharedPreferences.getString("city", ""), false);
+        if (actvCountry != null) actvCountry.setText(sharedPreferences.getString("country", ""), false);
+        if (etWeight != null) etWeight.setText(sharedPreferences.getString("weight", ""));
+        if (etHeight != null) etHeight.setText(sharedPreferences.getString("height", ""));
+        if (actvFitnessGoal != null) actvFitnessGoal.setText(sharedPreferences.getString("fitnessGoal", ""), false);
+        if (actvActivityLevel != null) actvActivityLevel.setText(sharedPreferences.getString("activityLevel", ""), false);
+        if (actvWorkoutType != null) actvWorkoutType.setText(sharedPreferences.getString("workoutType", ""), false);
         updateBmiChip();
     }
 
@@ -158,6 +161,8 @@ public class ProfileFragment extends Fragment {
     private void syncFirestoreToLocal(DocumentSnapshot doc) {
         Map<String, Object> data = new HashMap<>();
         data.put("username", doc.getString("username"));
+        data.put("dateRegistered", doc.getString("dateRegistered"));
+        data.put("email", doc.getString("email"));
         data.put("fullName", doc.getString("fullName"));
         data.put("dob", doc.getString("dob"));
         data.put("mobile", doc.getString("mobile"));
@@ -241,16 +246,30 @@ public class ProfileFragment extends Fragment {
             btnSignOut.setOnClickListener(v ->
                     new MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Sign Out")
-                            .setMessage("Sign out will clear local profile data.")
+                            .setMessage("Are you sure you want to sign out? This will clear your offline data.")
                             .setPositiveButton("Sign Out", (dialog, which) -> {
-                                sharedPreferences.edit().clear().apply(); // Clear cache
+
+                                // 1. Clear Local User Profile Cache
+                                sharedPreferences.edit().clear().apply();
+
+                                // 2. Clear Local Payment Cache
+                                requireContext().getSharedPreferences("PaymentCache", Context.MODE_PRIVATE)
+                                        .edit().clear().apply();
+
+                                // 3. Invalidate Firebase Session
                                 mAuth.signOut();
-                                // Add navigation to Login screen here
+
+                                // 4. Redirect to Sign In Activity and Clear Back Stack
+                                Intent intent = new Intent(requireActivity(), SignInActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+
                             })
                             .setNegativeButton("Cancel", null)
                             .show());
         }
     }
+
 
     private void setupPersonalInfoEdit(View view) {
         view.findViewById(R.id.btnEditPersonal).setOnClickListener(v -> {
@@ -339,7 +358,9 @@ public class ProfileFragment extends Fragment {
     private void bindViews(View view) {
         ivAvatar = view.findViewById(R.id.ivAvatar);
         tvProfileName = view.findViewById(R.id.tvProfileName);
+        tvProfileSubtitle = view.findViewById(R.id.tvProfileSubtitle);
         etFullName = view.findViewById(R.id.etFullName);
+        etEmail = view.findViewById(R.id.etEmail);
         etPhone = view.findViewById(R.id.etPhone);
         etDob = view.findViewById(R.id.etDob);
         layoutEditActions = view.findViewById(R.id.layoutEditActions);
@@ -399,10 +420,35 @@ public class ProfileFragment extends Fragment {
         photoPickerLauncher.launch(Intent.createChooser(intent, "Select profile photo"));
     }
 
+//    private void setupNavigation(View view) {
+//        View btnBack = view.findViewById(R.id.btnBack);
+//        if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+//    }
+
     private void setupNavigation(View view) {
+        // Back Button
         View btnBack = view.findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+
+        // Settings Buttons
+        View btnOpenSettings = view.findViewById(R.id.btnOpenSettings);
+        View cardGoToSettings = view.findViewById(R.id.cardGoToSettings);
+
+        View.OnClickListener navigateToSettings = v -> {
+            try {
+                // Ensure this ID matches the destination ID in your nav_graph.xml
+                Navigation.findNavController(v).navigate(R.id.nav_settings);
+            } catch (IllegalArgumentException e) {
+                Snackbar.make(view, "Settings routing not configured yet.", Snackbar.LENGTH_SHORT).show();
+            }
+        };
+
+        if (btnOpenSettings != null) btnOpenSettings.setOnClickListener(navigateToSettings);
+        if (cardGoToSettings != null) cardGoToSettings.setOnClickListener(navigateToSettings);
     }
+
+
+
 
     public static ProfileFragment newInstance() { return new ProfileFragment(); }
 }

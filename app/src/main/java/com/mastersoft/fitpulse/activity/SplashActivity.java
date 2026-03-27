@@ -21,6 +21,7 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.mastersoft.fitpulse.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -185,21 +186,9 @@ public class SplashActivity extends AppCompatActivity {
         pulse.start();
     }
 
-    /** Navigate to MainActivity and finish this activity. */
-//    private void launchMain() {
-//        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//        startActivity(intent);
-//        // Material-style fade transition into main
-//        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-//        finish();
-//    }
-
     private void launchMain() {
-
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
-
-        if (isLoggedIn) {
+        // Check Firebase Auth directly instead of SharedPreferences
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             // User is already logged in, go to Main
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -211,6 +200,25 @@ public class SplashActivity extends AppCompatActivity {
 
         finish();
     }
+
+
+//    private void launchMain() {
+//
+//        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+//        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+//
+//        if (isLoggedIn) {
+//            // User is already logged in, go to Main
+//            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+//            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        } else {
+//            // No user found, go to Login
+//            startActivity(new Intent(SplashActivity.this, SignInActivity.class));
+//            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        }
+//
+//        finish();
+//    }
 
     @Override
     protected void onDestroy() {
