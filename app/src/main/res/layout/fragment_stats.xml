@@ -93,6 +93,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressSteps"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="false"
@@ -160,6 +161,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressCalories"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="false"
@@ -235,6 +237,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressActiveTime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="false"
@@ -302,6 +305,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressDistance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="false"
@@ -340,6 +344,7 @@
 
                 <!-- Bar chart: 7 bars with day labels -->
                 <LinearLayout
+                    android:id="@+id/weeklyChartLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
