@@ -67,4 +67,7 @@ dependencies {
     implementation libs.payheredevs.payhere.android.sdk
     implementation libs.payheredevs.payhere.android.sdk
     implementation libs.appcompat.v160
+    
+    implementation libs.javamail
+    implementation libs.java.activation
 }

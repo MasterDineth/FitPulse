@@ -26,13 +26,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
 import com.mastersoft.fitpulse.activity.SignInActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
@@ -53,7 +57,7 @@ public class ProfileFragment extends Fragment {
 
     // Views
     private TextInputEditText etFullName, etEmail, etPhone, etDob;
-    private TextView tvProfileName,tvProfileSubtitle;
+    private TextView tvProfileName, tvProfileSubtitle;
     private View layoutEditActions;
     private TextInputEditText etAddress;
     private AutoCompleteTextView actvCity, actvCountry;
@@ -119,7 +123,12 @@ public class ProfileFragment extends Fragment {
 
     private void loadFromLocal() {
         if (tvProfileName != null) tvProfileName.setText(sharedPreferences.getString("username", "User"));
-        if (tvProfileSubtitle != null) tvProfileSubtitle.setText(sharedPreferences.getString("dateRegistered"+" Member · Since Jan 2026", ""));
+
+        // Fix: Use the correct key and a simple default fallback
+        if (tvProfileSubtitle != null) {
+            tvProfileSubtitle.setText(sharedPreferences.getString("dateRegistered", "Member"));
+        }
+
         if (etFullName != null) etFullName.setText(sharedPreferences.getString("fullName", ""));
         if (etEmail != null) etEmail.setText(sharedPreferences.getString("email", ""));
         if (etDob != null) etDob.setText(sharedPreferences.getString("dob", ""));
@@ -161,7 +170,6 @@ public class ProfileFragment extends Fragment {
     private void syncFirestoreToLocal(DocumentSnapshot doc) {
         Map<String, Object> data = new HashMap<>();
         data.put("username", doc.getString("username"));
-        data.put("dateRegistered", doc.getString("dateRegistered"));
         data.put("email", doc.getString("email"));
         data.put("fullName", doc.getString("fullName"));
         data.put("dob", doc.getString("dob"));
@@ -174,6 +182,17 @@ public class ProfileFragment extends Fragment {
         data.put("fitnessGoal", doc.getString("fitnessGoal"));
         data.put("activityLevel", doc.getString("activityLevel"));
         data.put("workoutType", doc.getString("workoutType"));
+
+        // Fix: Properly handle the Firestore Timestamp conversion
+        Timestamp timestamp = doc.getTimestamp("dateRegistered");
+        if (timestamp != null) {
+            Date date = timestamp.toDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy", Locale.getDefault());
+            data.put("dateRegistered", "Member · Since " + sdf.format(date));
+        } else {
+            data.put("dateRegistered", "Member");
+        }
+
         saveToLocal(data);
     }
 
@@ -420,11 +439,6 @@ public class ProfileFragment extends Fragment {
         photoPickerLauncher.launch(Intent.createChooser(intent, "Select profile photo"));
     }
 
-//    private void setupNavigation(View view) {
-//        View btnBack = view.findViewById(R.id.btnBack);
-//        if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
-//    }
-
     private void setupNavigation(View view) {
         // Back Button
         View btnBack = view.findViewById(R.id.btnBack);
@@ -446,9 +460,6 @@ public class ProfileFragment extends Fragment {
         if (btnOpenSettings != null) btnOpenSettings.setOnClickListener(navigateToSettings);
         if (cardGoToSettings != null) cardGoToSettings.setOnClickListener(navigateToSettings);
     }
-
-
-
 
     public static ProfileFragment newInstance() { return new ProfileFragment(); }
 }
