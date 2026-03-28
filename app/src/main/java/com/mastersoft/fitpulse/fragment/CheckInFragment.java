@@ -1,8 +1,10 @@
 package com.mastersoft.fitpulse.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -71,14 +73,10 @@ public class CheckInFragment extends Fragment {
             generateQrCode(ivQrCode, loader);
         }
 
-        // Manual check-in button
+        //Get directions button
         View btnManualCheckIn = view.findViewById(R.id.btnManualCheckIn);
         if (btnManualCheckIn != null) {
-            btnManualCheckIn.setOnClickListener(v ->
-                    Snackbar.make(view, "Manual Check in is Not Available Yet!", Snackbar.LENGTH_SHORT)
-                            .setAnchorView(v)
-                            .show()
-            );
+            btnManualCheckIn.setOnClickListener(v -> openGoogleMaps());
         }
 
         // ── Week calendar ────────────────────────────────────────────────────
@@ -109,6 +107,20 @@ public class CheckInFragment extends Fragment {
             if (dayView != null) {
                 applyDayState(dayView, dayLabels[i], attendanceStates[i]);
             }
+        }
+    }
+
+    private void openGoogleMaps() {
+        String mapUrl = "https://maps.app.goo.gl/JVv8wBEQzXvBUHcc7";
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl));
+        //use Google Maps if installed
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            //remove package restriction to open in browser or any available map app
+            intent.setPackage(null);
+            startActivity(intent);
         }
     }
 

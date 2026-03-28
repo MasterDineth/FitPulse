@@ -176,7 +176,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Manual Check-In"
+                    android:text="Go To Gym"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textStyle="bold" />
@@ -184,7 +184,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Already at the gym? Tap to check in"
+                    android:text="Need Navigation to the Gym?"
                     android:textAppearance="?attr/textAppearanceBodySmall"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:alpha="0.8"
@@ -195,7 +195,7 @@
                     style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:text="Check In Now"
+                    android:text="Get Directions"
                     android:textAppearance="?attr/textAppearanceLabelLarge"
                     android:backgroundTint="?attr/colorPrimary"
                     android:textColor="?attr/colorOnPrimary"

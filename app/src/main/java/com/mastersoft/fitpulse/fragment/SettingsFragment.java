@@ -310,7 +310,7 @@ public class SettingsFragment extends Fragment {
         view.findViewById(R.id.rowAbout).setOnClickListener(v ->
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("FitPulse")
-                        .setMessage("Version 1.0.0\n\nYour fitness, your rhythm.\n\n2024 FitPulse")
+                        .setMessage("Version 1.0.0\n\nYour fitness, your rhythm.\n\n2026 FitPulse")
                         .setPositiveButton("OK", null)
                         .show());
 
