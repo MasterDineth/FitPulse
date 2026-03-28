@@ -31,6 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class CheckInFragment extends Fragment {
 
     // ── Day state constants ──────────────────────────────────────────────────
@@ -113,9 +116,17 @@ public class CheckInFragment extends Fragment {
         loader.setVisibility(View.VISIBLE);
         ivQrCode.setVisibility(View.INVISIBLE);
 
-        String userId    = "USR_12345";
+        // 1. Fetch real user ID from Firebase Auth
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        // 2. Use the Firebase UID, or a fallback if the user is somehow logged out
+        String userId    = (currentUser != null) ? currentUser.getUid() : "UNKNOWN_USER";
+
         String date      = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String timestamp = String.valueOf(System.currentTimeMillis());
+
+        // 3. Construct the payload with the real UID
         String qrPayload = userId + "|" + date + "|" + timestamp;
 
         try {
@@ -153,8 +164,8 @@ public class CheckInFragment extends Fragment {
     private void applyDayState(View dayView, String label, int state) {
         if (dayView == null || getContext() == null) return;
 
-        // Since we use <include android:id="..."> in fragment_check_in.xml, the root 
-        // view's ID (dayCard) in item_day_card.xml is overridden by the include's ID 
+        // Since we use <include android:id="..."> in fragment_check_in.xml, the root
+        // view's ID (dayCard) in item_day_card.xml is overridden by the include's ID
         // (e.g., R.id.dayMon). Thus, dayView IS the MaterialCardView itself.
         MaterialCardView card;
         if (dayView instanceof MaterialCardView) {
