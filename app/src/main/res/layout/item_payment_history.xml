@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    app:cardCornerRadius="20dp"
     app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="20dp"
     app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="18dp"
-        android:gravity="center_vertical">
+        android:padding="18dp">
 
-        <!-- Left: month + plan name -->
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -41,12 +40,12 @@
                 android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
 
-        <!-- Right: amount + status chip -->
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvPaymentAmount"
@@ -61,14 +60,14 @@
                 android:id="@+id/chipPaymentStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Paid"
                 android:layout_marginTop="4dp"
-                app:chipBackgroundColor="?attr/colorTertiaryContainer"
-                android:textColor="?attr/colorOnTertiaryContainer"
-                app:chipMinHeight="24dp"
-                android:textAppearance="?attr/textAppearanceLabelSmall"
                 android:clickable="false"
-                android:focusable="false" />
+                android:focusable="false"
+                android:text="Paid"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorOnTertiaryContainer"
+                app:chipBackgroundColor="?attr/colorTertiaryContainer"
+                app:chipMinHeight="24dp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

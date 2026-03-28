@@ -2,76 +2,119 @@ package com.mastersoft.fitpulse.model;
 
 import com.google.firebase.Timestamp;
 
-/**
- * Mirrors a single document in the Firestore "paymentHistory" collection.
- *
- * Document schema:
- *   userId        : String     — authenticated user UID
- *   orderId       : String     — PayHere order_id / Firestore document ID
- *   planName      : String     — "Basic" | "Pro" | "Elite"
- *   amount        : double     — amount paid in LKR
- *   currency      : String     — "LKR"
- *   paymentDate   : Timestamp  — server timestamp when payment was confirmed
- *   renewalDate   : Timestamp  — paymentDate + 30 days
- *   status        : String     — "SUCCESS" | "FAILED" | "PENDING"
- *   paymentMethod : String     — returned by PayHere (e.g. "VISA", "MASTERCARD")
- *   paymentId     : String     — PayHere payment_id from callback
- */
 public class PaymentRecord {
 
-    private String    userId;
-    private String    orderId;
-    private String    planName;
-    private double    amount;
-    private String    currency;
+    private String userId;
+    private String orderId;
+    private String planName;
+    private double amount;
+    private String currency;
     private Timestamp paymentDate;
     private Timestamp renewalDate;
-    private String    status;
-    private String    paymentMethod;
-    private String    paymentId;
+    private String status;
+    private String paymentMethod;
+    private String paymentId;
 
     // Required no-arg constructor for Firestore
-    public PaymentRecord() {}
+    public PaymentRecord() {
+    }
 
     public PaymentRecord(String userId, String orderId, String planName,
                          double amount, String currency,
                          Timestamp paymentDate, Timestamp renewalDate,
                          String status, String paymentMethod, String paymentId) {
-        this.userId        = userId;
-        this.orderId       = orderId;
-        this.planName      = planName;
-        this.amount        = amount;
-        this.currency      = currency;
-        this.paymentDate   = paymentDate;
-        this.renewalDate   = renewalDate;
-        this.status        = status;
+        this.userId = userId;
+        this.orderId = orderId;
+        this.planName = planName;
+        this.amount = amount;
+        this.currency = currency;
+        this.paymentDate = paymentDate;
+        this.renewalDate = renewalDate;
+        this.status = status;
         this.paymentMethod = paymentMethod;
-        this.paymentId     = paymentId;
+        this.paymentId = paymentId;
     }
 
-    // ── Getters / Setters ─────────────────────────────────────────────────────
 
-    public String    getUserId()        { return userId; }
-    public String    getOrderId()       { return orderId; }
-    public String    getPlanName()      { return planName; }
-    public double    getAmount()        { return amount; }
-    public String    getCurrency()      { return currency; }
-    public Timestamp getPaymentDate()   { return paymentDate; }
-    public Timestamp getRenewalDate()   { return renewalDate; }
-    public String    getStatus()        { return status; }
-    public String    getPaymentMethod() { return paymentMethod; }
-    public String    getPaymentId()     { return paymentId; }
+    public String getUserId() {
+        return userId;
+    }
 
-    public void setUserId(String v)        { userId = v; }
-    public void setOrderId(String v)       { orderId = v; }
-    public void setPlanName(String v)      { planName = v; }
-    public void setAmount(double v)        { amount = v; }
-    public void setCurrency(String v)      { currency = v; }
-    public void setPaymentDate(Timestamp v){ paymentDate = v; }
-    public void setRenewalDate(Timestamp v){ renewalDate = v; }
-    public void setStatus(String v)        { status = v; }
-    public void setPaymentMethod(String v) { paymentMethod = v; }
-    public void setPaymentId(String v)     { paymentId = v; }
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public String getPlanName() {
+        return planName;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public Timestamp getPaymentDate() {
+        return paymentDate;
+    }
+
+    public Timestamp getRenewalDate() {
+        return renewalDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setUserId(String v) {
+        userId = v;
+    }
+
+    public void setOrderId(String v) {
+        orderId = v;
+    }
+
+    public void setPlanName(String v) {
+        planName = v;
+    }
+
+    public void setAmount(double v) {
+        amount = v;
+    }
+
+    public void setCurrency(String v) {
+        currency = v;
+    }
+
+    public void setPaymentDate(Timestamp v) {
+        paymentDate = v;
+    }
+
+    public void setRenewalDate(Timestamp v) {
+        renewalDate = v;
+    }
+
+    public void setStatus(String v) {
+        status = v;
+    }
+
+    public void setPaymentMethod(String v) {
+        paymentMethod = v;
+    }
+
+    public void setPaymentId(String v) {
+        paymentId = v;
+    }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -79,7 +122,6 @@ public class PaymentRecord {
         return "SUCCESS".equalsIgnoreCase(status);
     }
 
-    /** Returns formatted amount string, e.g. "Rs 5,000". */
     public String getFormattedAmount() {
         return String.format("Rs %,.0f", amount);
     }

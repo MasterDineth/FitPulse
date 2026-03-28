@@ -1,50 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    item_workout_history.xml
-    Single row in the Workout History list.
 
-    IDs referenced by WorkoutHistoryAdapter / HomeFragment:
-      ivWorkoutIcon   — workout type icon
-      tvWorkoutName   — e.g. "Advanced Upper Body"
-      tvWorkoutDate   — e.g. "26/01/25"
-      tvWorkoutDuration — e.g. "61 min"
--->
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    app:cardCornerRadius="20dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-    app:cardElevation="0dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:padding="16dp">
 
-        <!-- Type icon with coloured circle background -->
+
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivWorkoutIcon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_fitness_upper"
-            android:padding="10dp"
             android:background="@drawable/bg_workout_icon_pink"
+            android:padding="10dp"
+            android:src="@drawable/ic_fitness_upper"
             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
 
         <!-- Name + date column -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="14dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvWorkoutName"

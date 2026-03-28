@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!--  WORKOUT TIMER BAR  (GONE until Start pressed)                        -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardTimerBar"
         android:layout_width="match_parent"
@@ -17,8 +14,8 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="12dp"
         android:visibility="gone"
-        app:cardCornerRadius="24dp"
         app:cardBackgroundColor="?attr/colorPrimaryContainer"
+        app:cardCornerRadius="24dp"
         app:cardElevation="6dp">
 
         <LinearLayout
@@ -33,16 +30,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
+                android:orientation="horizontal">
 
                 <View
                     android:id="@+id/timerPulseDot"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
-                    android:background="@drawable/bg_timer_pulse_dot"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_timer_pulse_dot" />
 
                 <TextView
                     android:id="@+id/tvTimerWorkoutLabel"
@@ -58,11 +55,11 @@
                     android:id="@+id/tvElapsedTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
                     android:text="00:00"
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- Timer progress track -->
@@ -73,10 +70,10 @@
                 android:layout_marginBottom="12dp"
                 android:indeterminate="false"
                 android:progress="0"
-                app:trackCornerRadius="6dp"
-                app:trackThickness="8dp"
                 app:indicatorColor="?attr/colorPrimary"
-                app:trackColor="?attr/colorSurface" />
+                app:trackColor="?attr/colorSurface"
+                app:trackCornerRadius="6dp"
+                app:trackThickness="8dp" />
 
             <!-- Pause / Stop controls -->
             <LinearLayout
@@ -89,15 +86,15 @@
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
                     android:layout_height="46dp"
-                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="?attr/colorSurface"
                     android:text="Pause"
+                    android:textColor="?attr/colorPrimary"
+                    app:cornerRadius="14dp"
                     app:icon="@drawable/ic_pause"
                     app:iconGravity="textStart"
                     app:iconSize="18dp"
-                    app:cornerRadius="14dp"
-                    android:backgroundTint="?attr/colorSurface"
-                    android:textColor="?attr/colorPrimary"
                     app:iconTint="?attr/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
@@ -106,21 +103,19 @@
                     android:layout_width="0dp"
                     android:layout_height="46dp"
                     android:layout_weight="1"
+                    android:backgroundTint="?attr/colorErrorContainer"
                     android:text="End Workout"
+                    android:textColor="?attr/colorError"
+                    app:cornerRadius="14dp"
                     app:icon="@drawable/ic_stop"
                     app:iconGravity="textStart"
                     app:iconSize="18dp"
-                    app:cornerRadius="14dp"
-                    android:backgroundTint="?attr/colorErrorContainer"
-                    android:textColor="?attr/colorError"
                     app:iconTint="?attr/colorError" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!--  SCROLLABLE CONTENT                                                    -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -139,14 +134,14 @@
                 android:id="@+id/schedulesToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_marginBottom="16dp"
                 android:background="?attr/colorSurface"
                 app:navigationIcon="@drawable/ic_arrow_back"
                 app:navigationIconTint="?attr/colorOnSurface"
-                app:title="Schedules"
                 app:subtitle="Choose your workout plan"
+                app:title="Schedules"
                 app:titleTextAppearance="?attr/textAppearanceHeadlineMedium"
-                app:titleTextColor="?attr/colorOnSurface"
-                android:layout_marginBottom="16dp" />
+                app:titleTextColor="?attr/colorOnSurface" />
 
             <!-- Fetch loading indicator -->
             <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -156,10 +151,10 @@
                 android:layout_marginBottom="8dp"
                 android:indeterminate="true"
                 android:visibility="gone"
-                app:trackCornerRadius="4dp"
-                app:trackThickness="4dp"
                 app:indicatorColor="?attr/colorPrimary"
-                app:trackColor="?attr/colorSurfaceContainerHighest" />
+                app:trackColor="?attr/colorSurfaceContainerHighest"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="4dp" />
 
             <!-- Error card -->
             <com.google.android.material.card.MaterialCardView
@@ -168,15 +163,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:visibility="gone"
-                app:cardCornerRadius="20dp"
                 app:cardBackgroundColor="?attr/colorErrorContainer"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp"
-                    android:gravity="center_vertical">
+                    android:padding="14dp">
+
                     <TextView
                         android:id="@+id/tvErrorMessage"
                         android:layout_width="0dp"
@@ -185,6 +182,7 @@
                         android:text="Failed to load. Showing cached data."
                         android:textAppearance="?attr/textAppearanceBodySmall"
                         android:textColor="?attr/colorOnErrorContainer" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRetry"
                         style="@style/Widget.Material3.Button.TextButton"
@@ -195,18 +193,19 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Dynamic chip group (populated from Firebase "name" fields) -->
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="20dp"
+                android:scrollbars="none">
+
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupCategories"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true"
-                    app:selectionRequired="true" />
+                    app:selectionRequired="true"
+                    app:singleSelection="true" />
             </HorizontalScrollView>
 
             <!-- Today's Focus banner -->
@@ -215,27 +214,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
+                    android:padding="20dp">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:alpha="0.8"
                             android:text="Today's Focus"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:alpha="0.8" />
+                            android:textColor="?attr/colorOnPrimaryContainer" />
+
                         <TextView
                             android:id="@+id/tvTodayFocusTitle"
                             android:layout_width="wrap_content"
@@ -244,16 +247,18 @@
                             android:textAppearance="?attr/textAppearanceHeadlineMedium"
                             android:textColor="?attr/colorOnPrimaryContainer"
                             android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/tvTodayFocusSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:alpha="0.8"
                             android:text="Loading…"
                             android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:alpha="0.8"
-                            android:layout_marginTop="4dp" />
+                            android:textColor="?attr/colorOnPrimaryContainer" />
                     </LinearLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -262,62 +267,84 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Exercise Cards 1–6 ──────────────────────────────────── -->
-
-            <!-- ── Shared layout pattern: icon | name+detail | finishBtn | badge -->
-
             <!-- Exercise 1 (w1) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:cardCornerRadius="20dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise1"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_upper" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_purple"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_upper"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
+
                     <LinearLayout
-                        android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical"
-                        android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise1Name"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="—" android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise1Detail"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="—" android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise1Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise1Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFinish1"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp"
-                        android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
+
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/badgeNum1"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="1" android:gravity="center"
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="1"
                             android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -325,42 +352,81 @@
             <!-- Exercise 2 (w2) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise2"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow" app:cardElevation="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise2"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_upper" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_pink"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_upper"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise2Name" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise2Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise2Detail" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise2Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
-                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFinish2"
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFinish2"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp" android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
-                    <com.google.android.material.card.MaterialCardView android:id="@+id/badgeNum2"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp" app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/badgeNum2"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="2" android:gravity="center" android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="2"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -368,42 +434,81 @@
             <!-- Exercise 3 (w3) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise3"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow" app:cardElevation="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise3"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_upper" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_purple"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_upper"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise3Name" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise3Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise3Detail" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise3Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
-                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFinish3"
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFinish3"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp" android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
-                    <com.google.android.material.card.MaterialCardView android:id="@+id/badgeNum3"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp" app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/badgeNum3"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="3" android:gravity="center" android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="3"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -411,42 +516,81 @@
             <!-- Exercise 4 (w4) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise4"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow" app:cardElevation="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise4"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_cardio" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_orange"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_cardio"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise4Name" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise4Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise4Detail" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise4Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
-                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFinish4"
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFinish4"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp" android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
-                    <com.google.android.material.card.MaterialCardView android:id="@+id/badgeNum4"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp" app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/badgeNum4"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="4" android:gravity="center" android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="4"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -454,42 +598,81 @@
             <!-- Exercise 5 (w5) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise5"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow" app:cardElevation="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise5"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_lower" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_green"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_lower"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise5Name" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise5Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise5Detail" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise5Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
-                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFinish5"
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFinish5"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp" android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
-                    <com.google.android.material.card.MaterialCardView android:id="@+id/badgeNum5"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp" app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/badgeNum5"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="5" android:gravity="center" android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="5"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -497,42 +680,81 @@
             <!-- Exercise 6 (w6) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardExercise6"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow" app:cardElevation="0dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivExercise6"
-                        android:layout_width="52dp" android:layout_height="52dp"
-                        android:src="@drawable/ic_fitness_lower" android:padding="12dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:background="@drawable/bg_workout_icon_blue"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_fitness_lower"
                         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
-                        <TextView android:id="@+id/tvExercise6Name" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvExercise6Name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvExercise6Detail" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="—"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvExercise6Detail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
-                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFinish6"
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFinish6"
                         style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="44dp" android:layout_height="44dp" android:visibility="gone"
-                        app:icon="@drawable/ic_check_circle" app:iconSize="24dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_check_circle"
+                        app:iconSize="24dp"
                         app:iconTint="?attr/colorOnSurfaceVariant" />
-                    <com.google.android.material.card.MaterialCardView android:id="@+id/badgeNum6"
-                        android:layout_width="36dp" android:layout_height="36dp"
-                        app:cardCornerRadius="18dp" app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/badgeNum6"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                        app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:text="6" android:gravity="center" android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSurfaceVariant" android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="6"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -551,8 +773,8 @@
         android:layout_marginBottom="90dp"
         android:text="Start Workout"
         android:textAppearance="?attr/textAppearanceTitleMedium"
+        app:cornerRadius="28dp"
         app:icon="@drawable/ic_play"
-        app:iconGravity="textStart"
-        app:cornerRadius="28dp" />
+        app:iconGravity="textStart" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

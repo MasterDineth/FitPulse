@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:fillViewport="true"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ══════════════════════════════════════════════════════════════════ -->
-        <!--  HERO HEADER                                                       -->
-        <!-- ══════════════════════════════════════════════════════════════════ -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/profileHeader"
             android:layout_width="match_parent"
@@ -28,9 +25,9 @@
                 android:layout_height="44dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="16dp"
+                android:backgroundTint="@android:color/transparent"
                 app:icon="@drawable/ic_arrow_back"
                 app:iconTint="@android:color/white"
-                android:backgroundTint="@android:color/transparent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,40 +36,40 @@
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:layout_marginEnd="12dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="#33FFFFFF"
                 app:icon="@drawable/ic_settings"
                 app:iconTint="@android:color/white"
-                android:backgroundTint="#33FFFFFF"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.Full" />
 
             <!-- Tappable avatar card — opens photo picker -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAvatar"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                app:cardCornerRadius="48dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:cardElevation="4dp"
-                app:strokeColor="#FFFFFF"
-                app:strokeWidth="3dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="48dp"
+                app:cardElevation="4dp"
+                app:layout_constraintBottom_toTopOf="@id/tvProfileName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tvProfileName"
+                app:layout_constraintVertical_bias="0.40"
                 app:layout_constraintVertical_chainStyle="packed"
-                app:layout_constraintVertical_bias="0.40">
+                app:strokeColor="#FFFFFF"
+                app:strokeWidth="3dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivAvatar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_person"
                     android:scaleType="centerCrop"
+                    android:src="@drawable/ic_person"
                     app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Circle" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -80,30 +77,30 @@
                 android:id="@+id/fabChangePhoto"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                app:fabSize="mini"
-                app:srcCompat="@drawable/ic_camera"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
                 android:backgroundTint="?attr/colorPrimary"
-                app:tint="?attr/colorOnPrimary"
                 app:borderWidth="0dp"
                 app:elevation="2dp"
-                app:layout_constraintEnd_toEndOf="@id/cardAvatar"
+                app:fabSize="mini"
                 app:layout_constraintBottom_toBottomOf="@id/cardAvatar"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp" />
+                app:layout_constraintEnd_toEndOf="@id/cardAvatar"
+                app:srcCompat="@drawable/ic_camera"
+                app:tint="?attr/colorOnPrimary" />
 
             <TextView
                 android:id="@+id/tvProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                tools:text="Dineth Lanka"
                 android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/tvProfileSubtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardAvatar"
-                app:layout_constraintBottom_toTopOf="@id/tvProfileSubtitle" />
+                tools:text="Dineth Lanka" />
 
             <TextView
                 android:id="@+id/tvProfileSubtitle"
@@ -113,16 +110,14 @@
                 android:text="Member · Since Jan 2026"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="#CCffffff"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvProfileName"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tvProfileName" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- ══════════════════════════════════════════════════════════════════ -->
-        <!--  CONTENT BODY                                                      -->
-        <!-- ══════════════════════════════════════════════════════════════════ -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,70 +126,78 @@
             android:paddingTop="16dp"
             android:paddingBottom="40dp">
 
-            <!-- ── Achievement badges ─────────────────────────────────────── -->
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="20dp"
+                android:scrollbars="none">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <com.google.android.material.chip.Chip
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="false"
                         android:text="🏅 50 Sessions"
-                        android:layout_marginEnd="8dp"
-                        app:chipBackgroundColor="?attr/colorSecondaryContainer"
                         android:textColor="?attr/colorOnSecondaryContainer"
-                        android:clickable="false" />
+                        app:chipBackgroundColor="?attr/colorSecondaryContainer" />
+
                     <com.google.android.material.chip.Chip
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="false"
                         android:text="🔥 30-Day Streak"
-                        android:layout_marginEnd="8dp"
-                        app:chipBackgroundColor="?attr/colorTertiaryContainer"
                         android:textColor="?attr/colorOnTertiaryContainer"
-                        android:clickable="false" />
+                        app:chipBackgroundColor="?attr/colorTertiaryContainer" />
+
                     <com.google.android.material.chip.Chip
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="⭐ Top Performer"
                         android:layout_marginEnd="8dp"
-                        app:chipBackgroundColor="?attr/colorPrimaryContainer"
+                        android:clickable="false"
+                        android:text="⭐ Top Performer"
                         android:textColor="?attr/colorOnPrimaryContainer"
-                        android:clickable="false" />
+                        app:chipBackgroundColor="?attr/colorPrimaryContainer" />
+
                     <com.google.android.material.chip.Chip
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
                         android:text="💪 Goal Crusher"
-                        app:chipBackgroundColor="?attr/colorSurfaceContainerHigh"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:clickable="false" />
+                        app:chipBackgroundColor="?attr/colorSurfaceContainerHigh" />
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!-- ── Stats strip ───────────────────────────────────────────── -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="16dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:gravity="center"
+                        android:orientation="vertical"
                         android:padding="12dp">
+
                         <TextView
                             android:id="@+id/tvStatSessions"
                             android:layout_width="wrap_content"
@@ -203,6 +206,7 @@
                             android:textAppearance="?attr/textAppearanceTitleLarge"
                             android:textColor="?attr/colorPrimary"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -211,20 +215,23 @@
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="16dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:gravity="center"
+                        android:orientation="vertical"
                         android:padding="12dp">
+
                         <TextView
                             android:id="@+id/tvStatStreak"
                             android:layout_width="wrap_content"
@@ -233,6 +240,7 @@
                             android:textAppearance="?attr/textAppearanceTitleLarge"
                             android:textColor="?attr/colorTertiary"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -241,19 +249,22 @@
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:gravity="center"
+                        android:orientation="vertical"
                         android:padding="12dp">
+
                         <TextView
                             android:id="@+id/tvStatCals"
                             android:layout_width="wrap_content"
@@ -262,6 +273,7 @@
                             android:textAppearance="?attr/textAppearanceTitleLarge"
                             android:textColor="?attr/colorSecondary"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -272,28 +284,28 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  PERSONAL INFO CARD                                            -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPersonalInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="horizontal">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -302,141 +314,155 @@
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface"
                             android:textStyle="bold" />
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEditPersonal"
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
+                            android:minHeight="0dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:text="Edit"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             app:cornerRadius="8dp"
                             app:icon="@drawable/ic_edit"
-                            app:iconSize="14dp"
-                            android:minHeight="0dp"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp" />
+                            app:iconSize="14dp" />
                     </LinearLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilFullName"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Full Name"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_person"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Full Name"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_person"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etFullName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Dineth Lanka"
                             android:enabled="false"
-                            android:inputType="textPersonName" />
+                            android:inputType="textPersonName"
+                            android:text="Dineth Lanka" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilEmail"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_email"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Email"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_email"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etEmail"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="dinethupeka21@gmail.com"
                             android:enabled="false"
-                            android:inputType="textEmailAddress" />
+                            android:inputType="textEmailAddress"
+                            android:text="dinethupeka21@gmail.com" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilPhone"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Phone"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_phone"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Phone"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_phone"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etPhone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="+94 77 123 4567"
                             android:enabled="false"
-                            android:inputType="phone" />
+                            android:inputType="phone"
+                            android:text="+94 77 123 4567" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilDob"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Date of Birth"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_calendar"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Date of Birth"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_calendar"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etDob"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Oct 14 2002"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Oct 14 2002" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilMemberId"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Member ID"
-                        app:startIconDrawable="@drawable/ic_badge"
-                        app:startIconTint="?attr/colorSecondary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_badge"
+                        app:startIconTint="?attr/colorSecondary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMemberId"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="#FP-2024-0042"
                             android:enabled="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="#FP-2024-0042" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <LinearLayout
                         android:id="@+id/layoutEditActions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
                         android:visibility="gone">
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnCancelEdit"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:text="Cancel"
                             app:cornerRadius="12dp" />
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSavePersonal"
                             style="@style/Widget.Material3.Button"
@@ -449,15 +475,14 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-<!--                add billing data here  address, city(dropdown selection) , country (dropdown selection)  -->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBillingData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -469,9 +494,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="0dp"
@@ -487,14 +512,14 @@
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
+                            android:minHeight="0dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:text="Edit"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             app:cornerRadius="8dp"
                             app:icon="@drawable/ic_edit"
-                            app:iconSize="14dp"
-                            android:minHeight="0dp"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp" />
+                            app:iconSize="14dp" />
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -502,22 +527,22 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Address"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_home"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Address"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_home"
+                        app:startIconTint="?attr/colorPrimary">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="No 123, Main Street"
                             android:enabled="false"
-                            android:inputType="textPostalAddress" />
+                            android:inputType="textPostalAddress"
+                            android:text="No 123, Main Street" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -525,23 +550,23 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="City"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_location_city"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="City"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_location_city"
+                        app:startIconTint="?attr/colorPrimary">
 
                         <AutoCompleteTextView
                             android:id="@+id/actvCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Colombo"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Colombo" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -550,29 +575,29 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Country"
-                        app:startIconDrawable="@drawable/ic_public"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_public"
+                        app:startIconTint="?attr/colorPrimary">
 
                         <AutoCompleteTextView
                             android:id="@+id/actvCountry"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Sri Lanka"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Sri Lanka" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
                         android:id="@+id/layoutBillingActions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
                         android:visibility="gone">
 
                         <com.google.android.material.button.MaterialButton
@@ -580,8 +605,8 @@
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:text="Cancel"
                             app:cornerRadius="12dp" />
 
@@ -597,29 +622,29 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-<!--            billing data end-->
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  FITNESS DATA CARD                                             -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardFitnessData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="horizontal">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -628,47 +653,52 @@
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface"
                             android:textStyle="bold" />
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEditFitness"
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
+                            android:minHeight="0dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:text="Edit"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             app:cornerRadius="8dp"
                             app:icon="@drawable/ic_edit"
-                            app:iconSize="14dp"
-                            android:minHeight="0dp"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp" />
+                            app:iconSize="14dp" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal">
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tilWeight"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:hint="Weight (kg)"
-                            app:startIconDrawable="@drawable/ic_scale"
-                            app:startIconTint="?attr/colorTertiary"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp">
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:startIconDrawable="@drawable/ic_scale"
+                            app:startIconTint="?attr/colorTertiary">
+
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etWeight"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="72"
                                 android:enabled="false"
-                                android:inputType="numberDecimal" />
+                                android:inputType="numberDecimal"
+                                android:text="72" />
                         </com.google.android.material.textfield.TextInputLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tilHeight"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -676,27 +706,30 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="Height (cm)"
-                            app:startIconDrawable="@drawable/ic_height"
-                            app:startIconTint="?attr/colorTertiary"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp">
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:startIconDrawable="@drawable/ic_height"
+                            app:startIconTint="?attr/colorTertiary">
+
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etHeight"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="175"
                                 android:enabled="false"
-                                android:inputType="numberDecimal" />
+                                android:inputType="numberDecimal"
+                                android:text="175" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:orientation="horizontal">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -704,96 +737,106 @@
                             android:text="BMI"
                             android:textAppearance="?attr/textAppearanceBodyMedium"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipBmi"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="23.5 · Normal"
                             android:clickable="false"
-                            app:chipBackgroundColor="?attr/colorTertiaryContainer"
-                            android:textColor="?attr/colorOnTertiaryContainer" />
+                            android:text="23.5 · Normal"
+                            android:textColor="?attr/colorOnTertiaryContainer"
+                            app:chipBackgroundColor="?attr/colorTertiaryContainer" />
                     </LinearLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilFitnessGoal"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Fitness Goal"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_goal"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Fitness Goal"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_goal"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <AutoCompleteTextView
                             android:id="@+id/actvFitnessGoal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Muscle Gain"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Muscle Gain" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilActivityLevel"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Activity Level"
                         android:layout_marginBottom="12dp"
-                        app:startIconDrawable="@drawable/ic_fitness_upper"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        android:hint="Activity Level"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_fitness_upper"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <AutoCompleteTextView
                             android:id="@+id/actvActivityLevel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Moderately Active"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Moderately Active" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilWorkoutType"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Preferred Workout"
-                        app:startIconDrawable="@drawable/ic_fitness_cardio"
-                        app:startIconTint="?attr/colorPrimary"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_fitness_cardio"
+                        app:startIconTint="?attr/colorPrimary">
+
                         <AutoCompleteTextView
                             android:id="@+id/actvWorkoutType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Strength Training"
                             android:enabled="false"
                             android:focusable="false"
-                            android:inputType="none" />
+                            android:inputType="none"
+                            android:text="Strength Training" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <LinearLayout
                         android:id="@+id/layoutFitnessActions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
                         android:visibility="gone">
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnCancelFitness"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:text="Cancel"
                             app:cornerRadius="12dp" />
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSaveFitness"
                             style="@style/Widget.Material3.Button"
@@ -806,29 +849,32 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── App Settings quick-link card ─────────────────────────── -->
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardGoToSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardElevation="0dp"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
+                    android:padding="20dp">
+
                     <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_settings"
                         android:layout_marginEnd="14dp"
+                        android:src="@drawable/ic_settings"
                         app:tint="?attr/colorPrimary" />
+
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -837,6 +883,7 @@
                         android:textAppearance="?attr/textAppearanceBodyLarge"
                         android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold" />
+
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
@@ -845,20 +892,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Sign Out ───────────────────────────────────────────────── -->
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignOut"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
+                android:backgroundTint="?attr/colorErrorContainer"
                 android:text="Sign Out"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorError"
-                android:backgroundTint="?attr/colorErrorContainer"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/ic_logout"
-                app:iconTint="?attr/colorError"
-                app:iconGravity="textStart" />
+                app:iconGravity="textStart"
+                app:iconTint="?attr/colorError" />
 
         </LinearLayout>
     </LinearLayout>

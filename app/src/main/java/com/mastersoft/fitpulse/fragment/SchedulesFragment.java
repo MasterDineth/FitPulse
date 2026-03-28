@@ -1,8 +1,13 @@
 package com.mastersoft.fitpulse.fragment;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -36,25 +42,21 @@ import java.util.Locale;
 
 public class SchedulesFragment extends Fragment {
 
-
     private List<WorkoutPlan> workoutPlans = new ArrayList<>();
     private WorkoutPlan currentPlan = null;
 
     private boolean isWorkoutRunning = false;
     private boolean isWorkoutPaused = false;
-    private long elapsedSeconds = 0L;       // total active seconds
+    private long elapsedSeconds = 0L;
     private long pauseStartMs = 0L;
     private long workoutStartMs = 0L;
     private long totalPausedMs = 0L;
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
-    // Estimated duration per plan , used for progress bar max
-    private static final int ESTIMATED_DURATION_SEC = 45 * 60; // 45 min default
-
+    private static final int ESTIMATED_DURATION_SEC = 45 * 60;
 
     private final boolean[] exerciseFinished = new boolean[6];
-
 
     private View rootView;
     private ChipGroup chipGroup;
@@ -66,13 +68,11 @@ public class SchedulesFragment extends Fragment {
     private View cardError;
     private TextView tvErrorMessage;
 
-    // Exercise name / detail text views (index 0 = w1)
     private final TextView[] tvNames = new TextView[6];
     private final TextView[] tvDetails = new TextView[6];
     private final MaterialButton[] btnFinish = new MaterialButton[6];
     private final MaterialCardView[] badges = new MaterialCardView[6];
 
-    //ids
     private static final int[] NAME_IDS = {
             R.id.tvExercise1Name, R.id.tvExercise2Name, R.id.tvExercise3Name,
             R.id.tvExercise4Name, R.id.tvExercise5Name, R.id.tvExercise6Name
@@ -89,7 +89,6 @@ public class SchedulesFragment extends Fragment {
             R.id.badgeNum1, R.id.badgeNum2, R.id.badgeNum3,
             R.id.badgeNum4, R.id.badgeNum5, R.id.badgeNum6
     };
-
 
     @Nullable
     @Override
@@ -116,7 +115,6 @@ public class SchedulesFragment extends Fragment {
         stopTimer();
         showBottomNav();
     }
-
 
     private void bindViews(View view) {
         chipGroup = view.findViewById(R.id.chipGroupCategories);
@@ -154,18 +152,14 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    // Data loading
-
     private void loadWorkoutPlans(boolean forceRefresh) {
         setLoading(true);
         cardError.setVisibility(View.GONE);
 
         WorkoutRepository.getInstance(requireContext())
                 .getWorkoutPlans(forceRefresh, new WorkoutRepository.WorkoutPlansCallback() {
-
                     @Override
                     public void onCacheLoaded(List<WorkoutPlan> plans) {
-                        // load from cache
                         workoutPlans = plans;
                         populateChips(plans);
                         if (!plans.isEmpty()) selectPlan(plans.get(0));
@@ -174,13 +168,10 @@ public class SchedulesFragment extends Fragment {
 
                     @Override
                     public void onNetworkRefreshed(List<WorkoutPlan> plans) {
-                        //load data from firebase
                         workoutPlans = plans;
-                        // Preserve current selection if possible
                         String currentName = currentPlan != null ? currentPlan.getName() : "";
                         populateChips(plans);
 
-                        // Re-select the same category if it still exists
                         WorkoutPlan reselect = findPlanByName(currentName);
                         if (reselect == null && !plans.isEmpty()) reselect = plans.get(0);
                         if (reselect != null) selectPlan(reselect);
@@ -190,7 +181,6 @@ public class SchedulesFragment extends Fragment {
                     @Override
                     public void onError(Exception e) {
                         setLoading(false);
-                        // Only show error card if no data at all
                         if (workoutPlans.isEmpty()) {
                             tvErrorMessage.setText("Failed to load workouts: " + e.getMessage());
                             cardError.setVisibility(View.VISIBLE);
@@ -198,7 +188,6 @@ public class SchedulesFragment extends Fragment {
                     }
                 });
 
-        // Retry button
         rootView.findViewById(R.id.btnRetry).setOnClickListener(v -> loadWorkoutPlans(true));
     }
 
@@ -211,7 +200,6 @@ public class SchedulesFragment extends Fragment {
             chip.setCheckable(true);
             chip.setChecked(firstChip);
             chip.setTag(plan);
-            // Apply M3 Filter chip style programmatically
             chip.setChipBackgroundColorResource(com.google.android.material.R.color.m3_chip_background_color);
             chip.setOnCheckedChangeListener((btn, isChecked) -> {
                 if (isChecked) {
@@ -251,7 +239,6 @@ public class SchedulesFragment extends Fragment {
         return null;
     }
 
-
     private void setupButtons() {
         btnStartWorkout.setOnClickListener(v -> startWorkout());
         btnPauseResume.setOnClickListener(v -> togglePause());
@@ -263,7 +250,6 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    //Timer
     private void startWorkout() {
         if (currentPlan == null) {
             Snackbar.make(requireView(), "No workout selected", Snackbar.LENGTH_SHORT).show();
@@ -275,10 +261,8 @@ public class SchedulesFragment extends Fragment {
         totalPausedMs = 0;
         workoutStartMs = SystemClock.elapsedRealtime();
 
-        // Reset exercise finish states
         for (int i = 0; i < 6; i++) exerciseFinished[i] = false;
 
-        // Show timer bar, hide start button, show finish buttons, hide badges
         animateIn(cardTimerBar);
         btnStartWorkout.setVisibility(View.GONE);
         for (int i = 0; i < 6; i++) {
@@ -286,7 +270,6 @@ public class SchedulesFragment extends Fragment {
             badges[i].setVisibility(View.GONE);
         }
 
-        // Disable chip changes during workout
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             chipGroup.getChildAt(i).setEnabled(false);
         }
@@ -294,6 +277,8 @@ public class SchedulesFragment extends Fragment {
         timerProgressBar.setMax(ESTIMATED_DURATION_SEC);
         timerProgressBar.setProgress(0);
         startTimerTick();
+
+        sendWorkoutNotification("Workout Started", "You started " + currentPlan.getName() + "!", 1001);
     }
 
     private void startTimerTick() {
@@ -322,28 +307,22 @@ public class SchedulesFragment extends Fragment {
 
     private void togglePause() {
         if (isWorkoutPaused) {
-            // Resume
             long pauseDuration = SystemClock.elapsedRealtime() - pauseStartMs;
             totalPausedMs += pauseDuration;
             isWorkoutPaused = false;
             btnPauseResume.setText("Pause");
             btnPauseResume.setIconResource(R.drawable.ic_pause);
             startTimerTick();
-            // Restart pulse animation on dot
             startPulseDot(rootView.findViewById(R.id.timerPulseDot));
         } else {
-            // Pause
             pauseStartMs = SystemClock.elapsedRealtime();
             isWorkoutPaused = true;
             btnPauseResume.setText("Resume");
             btnPauseResume.setIconResource(R.drawable.ic_play);
             timerHandler.removeCallbacksAndMessages(null);
-            // Stop pulse animation
             rootView.findViewById(R.id.timerPulseDot).animate().alpha(0.3f).setDuration(300).start();
         }
     }
-
-    //  Stop / end workout
 
     private void confirmStopWorkout() {
         new MaterialAlertDialogBuilder(requireContext())
@@ -360,8 +339,6 @@ public class SchedulesFragment extends Fragment {
         if (currentPlan == null) return;
 
         String workoutType = currentPlan.getName();
-
-        // Retrieve user weight from profile
         double userWeightKg = getUserWeightKg();
 
         WorkoutHistoryRepository.getInstance()
@@ -385,6 +362,8 @@ public class SchedulesFragment extends Fragment {
     private void showWorkoutSummaryDialog(String type, long seconds) {
         int calories = (int) Math.round(5.0 * getUserWeightKg() * (seconds / 3600.0));
 
+        sendWorkoutNotification("Workout Complete!", "You burned ~" + calories + " kcal. Great job!", 1002);
+
         String message = "Workout type: " + type + "\n"
                 + "Duration: " + formatTime(seconds) + "\n"
                 + "Calories burned: ~" + calories + " kcal\n\n"
@@ -403,7 +382,6 @@ public class SchedulesFragment extends Fragment {
         isWorkoutPaused = false;
         elapsedSeconds = 0;
 
-        // Restore UI
         animateOut(cardTimerBar);
         btnStartWorkout.setVisibility(View.VISIBLE);
         btnPauseResume.setText("Pause");
@@ -415,7 +393,6 @@ public class SchedulesFragment extends Fragment {
             resetFinishButton(i);
         }
 
-        // Re-enable chip selection
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             chipGroup.getChildAt(i).setEnabled(true);
         }
@@ -424,11 +401,8 @@ public class SchedulesFragment extends Fragment {
         timerProgressBar.setProgress(0);
     }
 
-    // Per-exercise finish
-
     private void markExerciseDone(int index) {
         if (exerciseFinished[index]) {
-            // Already done — allow undo
             exerciseFinished[index] = false;
             resetFinishButton(index);
             return;
@@ -436,7 +410,6 @@ public class SchedulesFragment extends Fragment {
 
         exerciseFinished[index] = true;
 
-        // Turn the card green and the icon to a checkmark
         View card = getExerciseCard(index);
         if (card instanceof MaterialCardView) {
             ((MaterialCardView) card).setCardBackgroundColor(
@@ -451,7 +424,6 @@ public class SchedulesFragment extends Fragment {
                                 com.google.android.material.R.color.material_dynamic_tertiary40)));
         btnFinish[index].setIconTintResource(android.R.color.white);
 
-        // Check if all exercises are done. auto-prompt to finish
         boolean allDone = true;
         for (boolean done : exerciseFinished)
             if (!done) {
@@ -491,7 +463,6 @@ public class SchedulesFragment extends Fragment {
         return rootView.findViewById(cardIds[index]);
     }
 
-    //back button pressed during workout
     private void confirmBackDuringWorkout() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Leave Workout?")
@@ -503,8 +474,6 @@ public class SchedulesFragment extends Fragment {
                 .setNegativeButton("Keep going", null)
                 .show();
     }
-
-    // Animations
 
     private void animateIn(View view) {
         view.setAlpha(0f);
@@ -522,7 +491,6 @@ public class SchedulesFragment extends Fragment {
                 }).start();
     }
 
-
     private void startPulseDot(View dot) {
         if (dot == null) return;
         ObjectAnimator pulse = ObjectAnimator.ofFloat(dot, View.ALPHA, 1f, 0.2f);
@@ -533,11 +501,9 @@ public class SchedulesFragment extends Fragment {
         dot.setTag(pulse);
     }
 
-
     private void setLoading(boolean loading) {
         loadingIndicator.setVisibility(loading ? View.VISIBLE : View.GONE);
     }
-
 
     private String formatTime(long totalSeconds) {
         long minutes = totalSeconds / 60;
@@ -550,7 +516,6 @@ public class SchedulesFragment extends Fragment {
                 .getSharedPreferences("fitpulse_user_profile", android.content.Context.MODE_PRIVATE);
         return Double.longBitsToDouble(prefs.getLong("weight_kg", Double.doubleToLongBits(70.0)));
     }
-
 
     private void hideBottomNav() {
         if (getActivity() != null) {
@@ -566,6 +531,25 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
+    private void sendWorkoutNotification(String title, String message, int notificationId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "FITPULSE_CHANNEL")
+                .setSmallIcon(R.drawable.ic_pulse)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManager manager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(notificationId, builder.build());
+        }
+    }
 
     public static SchedulesFragment newInstance() {
         return new SchedulesFragment();
