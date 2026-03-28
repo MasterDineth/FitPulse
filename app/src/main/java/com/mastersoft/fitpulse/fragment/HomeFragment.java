@@ -46,38 +46,34 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
     private static final String TAG = "HomeFragment";
 
-    // ── Daily step / calorie targets ─────────────────────────────────────────
-    private static final int    STEP_GOAL     = 10_000;
-    private static final int    CALORIE_GOAL  = 700;
+
+    private static final int STEP_GOAL = 10_000;
+    private static final int CALORIE_GOAL = 700;
     private static final double CALORIES_PER_STEP = 0.04;
 
-    // ── Sensor & Local Storage ────────────────────────────────────────────────
+    //  Sensor & Local Storage
     private SensorManager sensorManager;
-    private Sensor        stepCounterSensor;
+    private Sensor stepCounterSensor;
     private SharedPreferences stepPrefs;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
-    // ── Firebase ──────────────────────────────────────────────────────────────
-    private FirebaseFirestore db;
-    private FirebaseAuth      auth;
 
-    // ── Views ─────────────────────────────────────────────────────────────────
-    private TextView                tvUserName;
-    private TextView                tvDateNumber;
-    private TextView                tvDayName;
-    private TextView                tvMonthName;
-    private TextView                tvSteps;
-    private TextView                tvCalories;
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+
+
+    private TextView tvUserName;
+    private TextView tvDateNumber;
+    private TextView tvDayName;
+    private TextView tvMonthName;
+    private TextView tvSteps;
+    private TextView tvCalories;
     private LinearProgressIndicator progressSteps;
     private LinearProgressIndicator progressCalories;
-    private LinearLayout            llWorkoutHistory;
+    private LinearLayout llWorkoutHistory;
 
-    // ── Workout history ───────────────────────────────────────────────────────
     private final List<WorkoutSession> workoutSessions = new ArrayList<>();
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,24 +104,24 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Firebase & Storage
-        db   = FirebaseFirestore.getInstance();
+
+        db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         stepPrefs = requireActivity().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
 
         // Sensor
-        sensorManager    = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
         bindViews(view);
         wireNavigation(view);
 
-        // Feature implementations
+
         updateCalendarCard();
         loadUserGreeting();
         loadWorkoutHistory();
 
-        // Load immediately from local storage so the UI isn't blank while waiting for the user to take a step
+        // Load immediately from local storage
         loadInitialStepData();
     }
 
@@ -143,19 +139,15 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  View binding
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void bindViews(View root) {
-        tvUserName        = root.findViewById(R.id.tvUserName);
-        tvDateNumber      = root.findViewById(R.id.tvDateNumber);
-        tvDayName         = root.findViewById(R.id.tvDayName);
-        tvSteps           = root.findViewById(R.id.tvSteps);
-        tvCalories        = root.findViewById(R.id.tvCalories);
-        progressSteps     = root.findViewById(R.id.progressSteps);
-        progressCalories  = root.findViewById(R.id.progressCalories);
-        llWorkoutHistory  = root.findViewById(R.id.llWorkoutHistory);
+        tvUserName = root.findViewById(R.id.tvUserName);
+        tvDateNumber = root.findViewById(R.id.tvDateNumber);
+        tvDayName = root.findViewById(R.id.tvDayName);
+        tvSteps = root.findViewById(R.id.tvSteps);
+        tvCalories = root.findViewById(R.id.tvCalories);
+        progressSteps = root.findViewById(R.id.progressSteps);
+        progressCalories = root.findViewById(R.id.progressCalories);
+        llWorkoutHistory = root.findViewById(R.id.llWorkoutHistory);
 
         View calendarCard = root.findViewById(R.id.cardCheckIn);
         if (calendarCard != null) {
@@ -182,7 +174,8 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         if (btnCheckIn != null) btnCheckIn.setOnClickListener(v -> navigateToCheckIn());
 
         View tvSeeAllHistory = view.findViewById(R.id.tvSeeAllHistory);
-        if (tvSeeAllHistory != null) tvSeeAllHistory.setOnClickListener(v -> switchTab(R.id.nav_history));
+        if (tvSeeAllHistory != null)
+            tvSeeAllHistory.setOnClickListener(v -> switchTab(R.id.nav_history));
 
         View btnSettings = view.findViewById(R.id.btnSettings);
         if (btnSettings != null) btnSettings.setOnClickListener(v -> navigateToSettings());
@@ -194,14 +187,16 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
     private void updateCalendarCard() {
         Calendar now = Calendar.getInstance();
-        if (tvDateNumber != null) tvDateNumber.setText(String.valueOf(now.get(Calendar.DAY_OF_MONTH)));
-        if (tvMonthName != null) tvMonthName.setText(new SimpleDateFormat("MMM", Locale.getDefault()).format(now.getTime()));
-        if (tvDayName != null) tvDayName.setText(new SimpleDateFormat("EEE", Locale.getDefault()).format(now.getTime()));
+        if (tvDateNumber != null)
+            tvDateNumber.setText(String.valueOf(now.get(Calendar.DAY_OF_MONTH)));
+        if (tvMonthName != null)
+            tvMonthName.setText(new SimpleDateFormat("MMM", Locale.getDefault()).format(now.getTime()));
+        if (tvDayName != null)
+            tvDayName.setText(new SimpleDateFormat("EEE", Locale.getDefault()).format(now.getTime()));
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 2 — Pedometer / Step Tracking (Robust Syncing)
-    // ─────────────────────────────────────────────────────────────────────────
+    //Pedometer / Step Tracking
+
 
     private void checkAndRequestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -212,7 +207,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 registerStepSensor();
             }
         } else {
-            // Permission automatically granted on Android 9 and below
             registerStepSensor();
         }
     }
@@ -233,7 +227,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             // Load today's steps if they exist
             updateStepDisplay(stepPrefs.getInt("savedStepsToday", 0));
         } else {
-            // It's a new day, initialize UI at 0
+            //initialize UI at 0 for new day
             updateStepDisplay(0);
         }
     }
@@ -250,21 +244,20 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         float lastSensorValue = stepPrefs.getFloat("lastSensorValue", rawSteps);
 
         if (!savedDate.equals(todayDate)) {
-            // It's a new day! Reset daily accumulation
+            // Reset daily accumulation
             savedStepsToday = 0;
             lastSensorValue = rawSteps;
         } else if (rawSteps < lastSensorValue) {
-            // The device was rebooted today, resetting the hardware sensor to 0.
-            // We keep our accumulated steps, but reset the baseline tracker.
+            // keep original step count to privent data loss if device reboots
             lastSensorValue = rawSteps;
         }
 
-        // Calculate steps taken since the last sensor update
+        // Calculate steps
         int delta = (int) (rawSteps - lastSensorValue);
         savedStepsToday += delta;
         lastSensorValue = rawSteps;
 
-        // Sync continuously to local storage to prevent data loss
+        // Sync to local storage to prevent data loss
         stepPrefs.edit()
                 .putString("lastSavedDate", todayDate)
                 .putInt("savedStepsToday", savedStepsToday)
@@ -275,7 +268,8 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 
     private void updateStepDisplay(int steps) {
         if (!isAdded()) return;
@@ -293,9 +287,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         if (progressCalories != null) progressCalories.setProgress(calProgress);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 3 — Workout history
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void loadWorkoutHistory() {
         FirebaseUser user = auth.getCurrentUser();
@@ -338,21 +329,17 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         for (WorkoutSession session : workoutSessions) {
             View row = inflater.inflate(R.layout.item_workout_history, llWorkoutHistory, false);
 
-            TextView tvName     = row.findViewById(R.id.tvWorkoutName);
-            TextView tvDate     = row.findViewById(R.id.tvWorkoutDate);
+            TextView tvName = row.findViewById(R.id.tvWorkoutName);
+            TextView tvDate = row.findViewById(R.id.tvWorkoutDate);
             TextView tvDuration = row.findViewById(R.id.tvWorkoutDuration);
 
-            if (tvName     != null) tvName.setText(session.getName());
-            if (tvDate     != null) tvDate.setText(session.getFormattedDate());
+            if (tvName != null) tvName.setText(session.getName());
+            if (tvDate != null) tvDate.setText(session.getFormattedDate());
             if (tvDuration != null) tvDuration.setText(session.getDurationMin() + " min");
 
             llWorkoutHistory.addView(row);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Feature 4 — User Greeting
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void loadUserGreeting() {
         FirebaseUser firebaseUser = auth.getCurrentUser();
@@ -376,7 +363,8 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                     if (name == null || name.isEmpty()) name = firebaseUser.getDisplayName();
                     if (name == null || name.isEmpty()) {
                         String email = firebaseUser.getEmail();
-                        if (email != null && email.contains("@")) name = email.substring(0, email.indexOf('@'));
+                        if (email != null && email.contains("@"))
+                            name = email.substring(0, email.indexOf('@'));
                     }
                     if (name == null || name.isEmpty()) name = "User";
 
@@ -395,10 +383,8 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Navigation logic
-    // ─────────────────────────────────────────────────────────────────────────
 
+    //  Navigation
     private void switchTab(int navId) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).navigateTo(navId);

@@ -38,9 +38,9 @@ public class CheckInFragment extends Fragment {
 
     // ── Day state constants ──────────────────────────────────────────────────
     public static final int STATE_FUTURE   = 0;   // grey dot
-    public static final int STATE_TODAY    = 1;   // pin icon, secondaryContainer bg
-    public static final int STATE_ATTENDED = 2;   // check icon, primary bg
-    public static final int STATE_MISSED   = 3;   // dot icon, errorContainer bg
+    public static final int STATE_TODAY    = 1;   // pin icon
+    public static final int STATE_ATTENDED = 2;   // check icon
+    public static final int STATE_MISSED   = 3;   // dot icon
 
     // QR code size in pixels
     private static final int QR_SIZE = 600;
@@ -63,7 +63,7 @@ public class CheckInFragment extends Fragment {
             btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
         }
 
-        // ── QR code generation ───────────────────────────────────────────────
+        //QR code generation
         ImageView ivQrCode               = view.findViewById(R.id.ivQrCode);
         CircularProgressIndicator loader = view.findViewById(R.id.qrLoadingIndicator);
 
@@ -71,11 +71,11 @@ public class CheckInFragment extends Fragment {
             generateQrCode(ivQrCode, loader);
         }
 
-        // ── Manual check-in button ───────────────────────────────────────────
+        // Manual check-in button
         View btnManualCheckIn = view.findViewById(R.id.btnManualCheckIn);
         if (btnManualCheckIn != null) {
             btnManualCheckIn.setOnClickListener(v ->
-                    Snackbar.make(view, "Check-in recorded!", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(view, "Manual Check in is Not Available Yet!", Snackbar.LENGTH_SHORT)
                             .setAnchorView(v)
                             .show()
             );
@@ -95,13 +95,13 @@ public class CheckInFragment extends Fragment {
         String[] dayLabels = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
         int[] attendanceStates = {
-                STATE_ATTENDED, // Mon
-                STATE_ATTENDED, // Tue
-                STATE_ATTENDED, // Wed
-                STATE_ATTENDED, // Thu
-                STATE_TODAY,    // Fri  ← today
-                STATE_FUTURE,   // Sat
-                STATE_FUTURE    // Sun
+                STATE_ATTENDED,
+                STATE_ATTENDED,
+                STATE_ATTENDED,
+                STATE_ATTENDED,
+                STATE_TODAY,
+                STATE_FUTURE,
+                STATE_FUTURE
         };
 
         for (int i = 0; i < dayIncludeIds.length; i++) {
@@ -116,17 +116,14 @@ public class CheckInFragment extends Fragment {
         loader.setVisibility(View.VISIBLE);
         ivQrCode.setVisibility(View.INVISIBLE);
 
-        // 1. Fetch real user ID from Firebase Auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
 
-        // 2. Use the Firebase UID, or a fallback if the user is somehow logged out
         String userId    = (currentUser != null) ? currentUser.getUid() : "UNKNOWN_USER";
 
         String date      = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String timestamp = String.valueOf(System.currentTimeMillis());
 
-        // 3. Construct the payload with the real UID
         String qrPayload = userId + "|" + date + "|" + timestamp;
 
         try {
@@ -164,9 +161,6 @@ public class CheckInFragment extends Fragment {
     private void applyDayState(View dayView, String label, int state) {
         if (dayView == null || getContext() == null) return;
 
-        // Since we use <include android:id="..."> in fragment_check_in.xml, the root
-        // view's ID (dayCard) in item_day_card.xml is overridden by the include's ID
-        // (e.g., R.id.dayMon). Thus, dayView IS the MaterialCardView itself.
         MaterialCardView card;
         if (dayView instanceof MaterialCardView) {
             card = (MaterialCardView) dayView;

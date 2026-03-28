@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:paddingBottom="40dp">
 
-        <!-- ── Top App Bar ─────────────────────────────────────────────────── -->
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/settingsToolbar"
             android:layout_width="match_parent"
@@ -32,9 +32,7 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="8dp">
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  NOTIFICATIONS                                                 -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -181,9 +179,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  APPEARANCE                                                    -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -293,9 +289,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  PRIVACY & LEGAL                                               -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -425,9 +419,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!--  DATA & STORAGE                                                -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

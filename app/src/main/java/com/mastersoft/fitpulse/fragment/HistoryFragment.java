@@ -36,17 +36,14 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
-        // Initialize UI
         tvSessionCount = view.findViewById(R.id.tvSessionCount);
         tvTotalCals = view.findViewById(R.id.tvTotalCals);
         tvAvgTime = view.findViewById(R.id.tvAvgTime);
         recyclerViewHistory = view.findViewById(R.id.recyclerViewHistory);
 
-        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Setup RecyclerView
         workoutList = new ArrayList<>();
         adapter = new WorkoutAdapter(workoutList);
         recyclerViewHistory.setAdapter(adapter);

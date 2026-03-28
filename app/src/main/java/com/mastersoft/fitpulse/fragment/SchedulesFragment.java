@@ -36,45 +36,44 @@ import java.util.Locale;
 
 public class SchedulesFragment extends Fragment {
 
-    // ── Data ──────────────────────────────────────────────────────────────────
-    private List<WorkoutPlan> workoutPlans = new ArrayList<>();
-    private WorkoutPlan currentPlan        = null;
 
-    // ── Timer state ───────────────────────────────────────────────────────────
+    private List<WorkoutPlan> workoutPlans = new ArrayList<>();
+    private WorkoutPlan currentPlan = null;
+
     private boolean isWorkoutRunning = false;
-    private boolean isWorkoutPaused  = false;
-    private long    elapsedSeconds   = 0L;       // total active seconds
-    private long    pauseStartMs     = 0L;
-    private long    workoutStartMs   = 0L;
-    private long    totalPausedMs    = 0L;
-    private final Handler timerHandler   = new Handler(Looper.getMainLooper());
+    private boolean isWorkoutPaused = false;
+    private long elapsedSeconds = 0L;       // total active seconds
+    private long pauseStartMs = 0L;
+    private long workoutStartMs = 0L;
+    private long totalPausedMs = 0L;
+    private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
-    // Estimated duration per plan (seconds), used for progress bar max
+    // Estimated duration per plan , used for progress bar max
     private static final int ESTIMATED_DURATION_SEC = 45 * 60; // 45 min default
 
-    // ── Per-exercise finish state ─────────────────────────────────────────────
+
     private final boolean[] exerciseFinished = new boolean[6];
 
-    // ── View refs ─────────────────────────────────────────────────────────────
-    private View              rootView;
-    private ChipGroup         chipGroup;
-    private TextView          tvFocusTitle, tvFocusSubtitle;
-    private View              cardTimerBar;
-    private TextView          tvTimerLabel, tvElapsedTime;
+
+    private View rootView;
+    private ChipGroup chipGroup;
+    private TextView tvFocusTitle, tvFocusSubtitle;
+    private View cardTimerBar;
+    private TextView tvTimerLabel, tvElapsedTime;
     private LinearProgressIndicator timerProgressBar, loadingIndicator;
-    private MaterialButton    btnPauseResume, btnStopWorkout, btnStartWorkout;
-    private View              cardError;
-    private TextView          tvErrorMessage;
+    private MaterialButton btnPauseResume, btnStopWorkout, btnStartWorkout;
+    private View cardError;
+    private TextView tvErrorMessage;
 
     // Exercise name / detail text views (index 0 = w1)
-    private final TextView[]       tvNames   = new TextView[6];
-    private final TextView[]       tvDetails = new TextView[6];
+    private final TextView[] tvNames = new TextView[6];
+    private final TextView[] tvDetails = new TextView[6];
     private final MaterialButton[] btnFinish = new MaterialButton[6];
-    private final MaterialCardView[] badges  = new MaterialCardView[6];
+    private final MaterialCardView[] badges = new MaterialCardView[6];
 
-    // ── IDs ───────────────────────────────────────────────────────────────────
-    private static final int[] NAME_IDS  = {
+    //ids
+    private static final int[] NAME_IDS = {
             R.id.tvExercise1Name, R.id.tvExercise2Name, R.id.tvExercise3Name,
             R.id.tvExercise4Name, R.id.tvExercise5Name, R.id.tvExercise6Name
     };
@@ -91,7 +90,6 @@ public class SchedulesFragment extends Fragment {
             R.id.badgeNum4, R.id.badgeNum5, R.id.badgeNum6
     };
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     @Nullable
     @Override
@@ -119,28 +117,27 @@ public class SchedulesFragment extends Fragment {
         showBottomNav();
     }
 
-    // ── View binding ──────────────────────────────────────────────────────────
 
     private void bindViews(View view) {
-        chipGroup        = view.findViewById(R.id.chipGroupCategories);
-        tvFocusTitle     = view.findViewById(R.id.tvTodayFocusTitle);
-        tvFocusSubtitle  = view.findViewById(R.id.tvTodayFocusSubtitle);
-        cardTimerBar     = view.findViewById(R.id.cardTimerBar);
-        tvTimerLabel     = view.findViewById(R.id.tvTimerWorkoutLabel);
-        tvElapsedTime    = view.findViewById(R.id.tvElapsedTime);
+        chipGroup = view.findViewById(R.id.chipGroupCategories);
+        tvFocusTitle = view.findViewById(R.id.tvTodayFocusTitle);
+        tvFocusSubtitle = view.findViewById(R.id.tvTodayFocusSubtitle);
+        cardTimerBar = view.findViewById(R.id.cardTimerBar);
+        tvTimerLabel = view.findViewById(R.id.tvTimerWorkoutLabel);
+        tvElapsedTime = view.findViewById(R.id.tvElapsedTime);
         timerProgressBar = view.findViewById(R.id.timerProgressBar);
         loadingIndicator = view.findViewById(R.id.loadingIndicator);
-        btnPauseResume   = view.findViewById(R.id.btnPauseResume);
-        btnStopWorkout   = view.findViewById(R.id.btnStopWorkout);
-        btnStartWorkout  = view.findViewById(R.id.btnStartWorkout);
-        cardError        = view.findViewById(R.id.cardError);
-        tvErrorMessage   = view.findViewById(R.id.tvErrorMessage);
+        btnPauseResume = view.findViewById(R.id.btnPauseResume);
+        btnStopWorkout = view.findViewById(R.id.btnStopWorkout);
+        btnStartWorkout = view.findViewById(R.id.btnStartWorkout);
+        cardError = view.findViewById(R.id.cardError);
+        tvErrorMessage = view.findViewById(R.id.tvErrorMessage);
 
         for (int i = 0; i < 6; i++) {
-            tvNames[i]   = view.findViewById(NAME_IDS[i]);
+            tvNames[i] = view.findViewById(NAME_IDS[i]);
             tvDetails[i] = view.findViewById(DETAIL_IDS[i]);
             btnFinish[i] = view.findViewById(FINISH_IDS[i]);
-            badges[i]    = view.findViewById(BADGE_IDS[i]);
+            badges[i] = view.findViewById(BADGE_IDS[i]);
         }
     }
 
@@ -157,7 +154,7 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    // ── Data loading ──────────────────────────────────────────────────────────
+    // Data loading
 
     private void loadWorkoutPlans(boolean forceRefresh) {
         setLoading(true);
@@ -168,7 +165,7 @@ public class SchedulesFragment extends Fragment {
 
                     @Override
                     public void onCacheLoaded(List<WorkoutPlan> plans) {
-                        // Delivered from cache (possibly stale) — populate UI immediately
+                        // load from cache
                         workoutPlans = plans;
                         populateChips(plans);
                         if (!plans.isEmpty()) selectPlan(plans.get(0));
@@ -177,7 +174,7 @@ public class SchedulesFragment extends Fragment {
 
                     @Override
                     public void onNetworkRefreshed(List<WorkoutPlan> plans) {
-                        // Network data arrived — refresh chips & content silently
+                        //load data from firebase
                         workoutPlans = plans;
                         // Preserve current selection if possible
                         String currentName = currentPlan != null ? currentPlan.getName() : "";
@@ -205,11 +202,6 @@ public class SchedulesFragment extends Fragment {
         rootView.findViewById(R.id.btnRetry).setOnClickListener(v -> loadWorkoutPlans(true));
     }
 
-    // ── Chip group ────────────────────────────────────────────────────────────
-
-    /**
-     * Clears and re-adds chips based on the "name" field of each WorkoutPlan document.
-     */
     private void populateChips(List<WorkoutPlan> plans) {
         chipGroup.removeAllViews();
         boolean firstChip = true;
@@ -232,9 +224,6 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    /**
-     * Updates the focus banner and exercise cards for the given plan.
-     */
     private void selectPlan(WorkoutPlan plan) {
         currentPlan = plan;
         String[] exercises = plan.getExercises();
@@ -262,7 +251,6 @@ public class SchedulesFragment extends Fragment {
         return null;
     }
 
-    // ── Buttons ───────────────────────────────────────────────────────────────
 
     private void setupButtons() {
         btnStartWorkout.setOnClickListener(v -> startWorkout());
@@ -275,18 +263,17 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    // ── Timer ─────────────────────────────────────────────────────────────────
-
+    //Timer
     private void startWorkout() {
         if (currentPlan == null) {
             Snackbar.make(requireView(), "No workout selected", Snackbar.LENGTH_SHORT).show();
             return;
         }
         isWorkoutRunning = true;
-        isWorkoutPaused  = false;
-        elapsedSeconds   = 0;
-        totalPausedMs    = 0;
-        workoutStartMs   = SystemClock.elapsedRealtime();
+        isWorkoutPaused = false;
+        elapsedSeconds = 0;
+        totalPausedMs = 0;
+        workoutStartMs = SystemClock.elapsedRealtime();
 
         // Reset exercise finish states
         for (int i = 0; i < 6; i++) exerciseFinished[i] = false;
@@ -315,8 +302,8 @@ public class SchedulesFragment extends Fragment {
             public void run() {
                 if (!isWorkoutRunning || isWorkoutPaused) return;
 
-                long nowMs     = SystemClock.elapsedRealtime();
-                long activeMs  = nowMs - workoutStartMs - totalPausedMs;
+                long nowMs = SystemClock.elapsedRealtime();
+                long activeMs = nowMs - workoutStartMs - totalPausedMs;
                 elapsedSeconds = activeMs / 1000L;
 
                 tvElapsedTime.setText(formatTime(elapsedSeconds));
@@ -346,7 +333,7 @@ public class SchedulesFragment extends Fragment {
             startPulseDot(rootView.findViewById(R.id.timerPulseDot));
         } else {
             // Pause
-            pauseStartMs    = SystemClock.elapsedRealtime();
+            pauseStartMs = SystemClock.elapsedRealtime();
             isWorkoutPaused = true;
             btnPauseResume.setText("Resume");
             btnPauseResume.setIconResource(R.drawable.ic_play);
@@ -356,7 +343,7 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    // ── Stop / end workout ────────────────────────────────────────────────────
+    //  Stop / end workout
 
     private void confirmStopWorkout() {
         new MaterialAlertDialogBuilder(requireContext())
@@ -374,7 +361,7 @@ public class SchedulesFragment extends Fragment {
 
         String workoutType = currentPlan.getName();
 
-        // Retrieve user weight from profile if available (fallback = 0 → default)
+        // Retrieve user weight from profile
         double userWeightKg = getUserWeightKg();
 
         WorkoutHistoryRepository.getInstance()
@@ -401,10 +388,10 @@ public class SchedulesFragment extends Fragment {
         String message = "Workout type: " + type + "\n"
                 + "Duration: " + formatTime(seconds) + "\n"
                 + "Calories burned: ~" + calories + " kcal\n\n"
-                + "Great work! 💪";
+                + "Great work!";
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Session Complete! 🏆")
+                .setTitle("Session Complete!")
                 .setMessage(message)
                 .setPositiveButton("Done", (d, w) -> resetWorkoutUI())
                 .setCancelable(false)
@@ -413,8 +400,8 @@ public class SchedulesFragment extends Fragment {
 
     private void resetWorkoutUI() {
         isWorkoutRunning = false;
-        isWorkoutPaused  = false;
-        elapsedSeconds   = 0;
+        isWorkoutPaused = false;
+        elapsedSeconds = 0;
 
         // Restore UI
         animateOut(cardTimerBar);
@@ -437,7 +424,7 @@ public class SchedulesFragment extends Fragment {
         timerProgressBar.setProgress(0);
     }
 
-    // ── Per-exercise finish ───────────────────────────────────────────────────
+    // Per-exercise finish
 
     private void markExerciseDone(int index) {
         if (exerciseFinished[index]) {
@@ -449,7 +436,7 @@ public class SchedulesFragment extends Fragment {
 
         exerciseFinished[index] = true;
 
-        // Turn the card green (TertiaryContainer) and the icon to a checkmark
+        // Turn the card green and the icon to a checkmark
         View card = getExerciseCard(index);
         if (card instanceof MaterialCardView) {
             ((MaterialCardView) card).setCardBackgroundColor(
@@ -464,9 +451,13 @@ public class SchedulesFragment extends Fragment {
                                 com.google.android.material.R.color.material_dynamic_tertiary40)));
         btnFinish[index].setIconTintResource(android.R.color.white);
 
-        // Check if all exercises are done → auto-prompt to finish
+        // Check if all exercises are done. auto-prompt to finish
         boolean allDone = true;
-        for (boolean done : exerciseFinished) if (!done) { allDone = false; break; }
+        for (boolean done : exerciseFinished)
+            if (!done) {
+                allDone = false;
+                break;
+            }
         if (allDone) {
             Snackbar.make(requireView(), "All exercises complete! 🎉 Tap End Workout to save.",
                             Snackbar.LENGTH_LONG)
@@ -500,8 +491,7 @@ public class SchedulesFragment extends Fragment {
         return rootView.findViewById(cardIds[index]);
     }
 
-    // ── Back button handling ──────────────────────────────────────────────────
-
+    //back button pressed during workout
     private void confirmBackDuringWorkout() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Leave Workout?")
@@ -514,7 +504,7 @@ public class SchedulesFragment extends Fragment {
                 .show();
     }
 
-    // ── Animation helpers ─────────────────────────────────────────────────────
+    // Animations
 
     private void animateIn(View view) {
         view.setAlpha(0f);
@@ -532,7 +522,7 @@ public class SchedulesFragment extends Fragment {
                 }).start();
     }
 
-    /** Infinite alpha pulse on the live indicator dot. */
+
     private void startPulseDot(View dot) {
         if (dot == null) return;
         ObjectAnimator pulse = ObjectAnimator.ofFloat(dot, View.ALPHA, 1f, 0.2f);
@@ -543,13 +533,11 @@ public class SchedulesFragment extends Fragment {
         dot.setTag(pulse);
     }
 
-    // ── Loading state ─────────────────────────────────────────────────────────
 
     private void setLoading(boolean loading) {
         loadingIndicator.setVisibility(loading ? View.VISIBLE : View.GONE);
     }
 
-    // ── Utility ───────────────────────────────────────────────────────────────
 
     private String formatTime(long totalSeconds) {
         long minutes = totalSeconds / 60;
@@ -557,14 +545,12 @@ public class SchedulesFragment extends Fragment {
         return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
     }
 
-    /** Reads user weight from SharedPreferences (set via ProfileFragment). Returns 0 if not set. */
     private double getUserWeightKg() {
         android.content.SharedPreferences prefs = requireContext()
                 .getSharedPreferences("fitpulse_user_profile", android.content.Context.MODE_PRIVATE);
         return Double.longBitsToDouble(prefs.getLong("weight_kg", Double.doubleToLongBits(70.0)));
     }
 
-    // ── Bottom nav ────────────────────────────────────────────────────────────
 
     private void hideBottomNav() {
         if (getActivity() != null) {
@@ -580,7 +566,6 @@ public class SchedulesFragment extends Fragment {
         }
     }
 
-    // ── Factory ───────────────────────────────────────────────────────────────
 
     public static SchedulesFragment newInstance() {
         return new SchedulesFragment();

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,11 +40,10 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
             holder.tvWorkoutDate.setText(dateFormat.format(workout.getDate()));
         }
 
-        // Note: Replace the string literal emojis with proper drawable icons in production if preferred
+
         holder.tvWorkoutDuration.setText(" " + (int) workout.getTotalMinutes() + " min");
         holder.tvWorkoutCalories.setText("  " + workout.getCaloriesBurned() + " kcal");
 
-        // Optional: Set icon and background based on workout.getType() here
     }
 
     @Override

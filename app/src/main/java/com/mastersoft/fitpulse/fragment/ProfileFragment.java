@@ -72,6 +72,7 @@ public class ProfileFragment extends Fragment {
     private ActivityResultLauncher<Intent> photoPickerLauncher;
 
     // Dropdown option arrays
+    // Hardcoded strings to reduce unnessasory network calls
     private static final String[] GOALS = {"Muscle Gain", "Weight Loss", "Endurance", "Flexibility", "General Fitness"};
     private static final String[] ACTIVITY_LEVELS = {"Sedentary", "Lightly Active", "Moderately Active", "Very Active", "Extremely Active"};
     private static final String[] WORKOUT_TYPES = {"Strength Training", "Cardio", "HIIT", "Yoga", "CrossFit", "Mixed"};
@@ -103,10 +104,10 @@ public class ProfileFragment extends Fragment {
         bindViews(view);
         setupDropdowns();
 
-        // 1. Load from local cache immediately for offline/speed
+        // 1. Load from local data
         loadFromLocal();
 
-        // 2. If local cache is empty, fetch from Firebase
+        // load data form firebase if loacl storage empty
         if (!sharedPreferences.contains("username")) {
             loadUserDataFromFirestore();
         }
@@ -119,10 +120,11 @@ public class ProfileFragment extends Fragment {
         setupSignOut(view);
     }
 
-    // ── DATA HANDLING (Local + Remote) ────────────────────────────────────────
+    // Data loading (local || firestore)
 
     private void loadFromLocal() {
-        if (tvProfileName != null) tvProfileName.setText(sharedPreferences.getString("username", "User"));
+        if (tvProfileName != null)
+            tvProfileName.setText(sharedPreferences.getString("username", "User"));
 
         // Fix: Use the correct key and a simple default fallback
         if (tvProfileSubtitle != null) {
@@ -135,12 +137,16 @@ public class ProfileFragment extends Fragment {
         if (etPhone != null) etPhone.setText(sharedPreferences.getString("mobile", ""));
         if (etAddress != null) etAddress.setText(sharedPreferences.getString("address", ""));
         if (actvCity != null) actvCity.setText(sharedPreferences.getString("city", ""), false);
-        if (actvCountry != null) actvCountry.setText(sharedPreferences.getString("country", ""), false);
+        if (actvCountry != null)
+            actvCountry.setText(sharedPreferences.getString("country", ""), false);
         if (etWeight != null) etWeight.setText(sharedPreferences.getString("weight", ""));
         if (etHeight != null) etHeight.setText(sharedPreferences.getString("height", ""));
-        if (actvFitnessGoal != null) actvFitnessGoal.setText(sharedPreferences.getString("fitnessGoal", ""), false);
-        if (actvActivityLevel != null) actvActivityLevel.setText(sharedPreferences.getString("activityLevel", ""), false);
-        if (actvWorkoutType != null) actvWorkoutType.setText(sharedPreferences.getString("workoutType", ""), false);
+        if (actvFitnessGoal != null)
+            actvFitnessGoal.setText(sharedPreferences.getString("fitnessGoal", ""), false);
+        if (actvActivityLevel != null)
+            actvActivityLevel.setText(sharedPreferences.getString("activityLevel", ""), false);
+        if (actvWorkoutType != null)
+            actvWorkoutType.setText(sharedPreferences.getString("workoutType", ""), false);
         updateBmiChip();
     }
 
@@ -183,7 +189,7 @@ public class ProfileFragment extends Fragment {
         data.put("activityLevel", doc.getString("activityLevel"));
         data.put("workoutType", doc.getString("workoutType"));
 
-        // Fix: Properly handle the Firestore Timestamp conversion
+
         Timestamp timestamp = doc.getTimestamp("dateRegistered");
         if (timestamp != null) {
             Date date = timestamp.toDate();
@@ -257,7 +263,7 @@ public class ProfileFragment extends Fragment {
         toggleActionsVisibility(layoutFitnessActions, false);
     }
 
-    // ── REMAINING LOGIC (UI, Nav, Helper) ────────────────────────────────────
+    // signout
 
     private void setupSignOut(View view) {
         View btnSignOut = view.findViewById(R.id.btnSignOut);
@@ -268,17 +274,17 @@ public class ProfileFragment extends Fragment {
                             .setMessage("Are you sure you want to sign out? This will clear your offline data.")
                             .setPositiveButton("Sign Out", (dialog, which) -> {
 
-                                // 1. Clear Local User Profile Cache
+                                //Clear Local User Profile Cache
                                 sharedPreferences.edit().clear().apply();
 
-                                // 2. Clear Local Payment Cache
+                                // Clear Local Payment Cache
                                 requireContext().getSharedPreferences("PaymentCache", Context.MODE_PRIVATE)
                                         .edit().clear().apply();
 
-                                // 3. Invalidate Firebase Session
+                                // Invalidate Firebase Session
                                 mAuth.signOut();
 
-                                // 4. Redirect to Sign In Activity and Clear Back Stack
+                                // Redirect to Sign In Activity
                                 Intent intent = new Intent(requireActivity(), SignInActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
@@ -299,7 +305,9 @@ public class ProfileFragment extends Fragment {
         });
         view.findViewById(R.id.btnCancelEdit).setOnClickListener(v -> exitPersonalEdit(false));
         view.findViewById(R.id.btnSavePersonal).setOnClickListener(v -> exitPersonalEdit(true));
-        if (etDob != null) etDob.setOnClickListener(v -> { if (isEditingPersonal) showDatePicker(); });
+        if (etDob != null) etDob.setOnClickListener(v -> {
+            if (isEditingPersonal) showDatePicker();
+        });
     }
 
     private void setupBillingEdit(View view) {
@@ -322,9 +330,15 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.btnSaveFitness).setOnClickListener(v -> exitFitnessEdit(true));
 
         android.text.TextWatcher bmiWatcher = new android.text.TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            public void onTextChanged(CharSequence s, int st, int b, int c) {}
-            public void afterTextChanged(android.text.Editable s) { updateBmiChip(); }
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
+            }
+
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+            }
+
+            public void afterTextChanged(android.text.Editable s) {
+                updateBmiChip();
+            }
         };
         etWeight.addTextChangedListener(bmiWatcher);
         etHeight.addTextChangedListener(bmiWatcher);
@@ -353,7 +367,8 @@ public class ProfileFragment extends Fragment {
             if (chipBmi != null) {
                 chipBmi.setText(String.format(java.util.Locale.getDefault(), "%.1f · %s", bmi, bmiCategory(bmi)));
             }
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
     }
 
     private String bmiCategory(double bmi) {
@@ -398,11 +413,16 @@ public class ProfileFragment extends Fragment {
 
     private void setupDropdowns() {
         if (getContext() == null) return;
-        if (actvFitnessGoal != null) actvFitnessGoal.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, GOALS));
-        if (actvActivityLevel != null) actvActivityLevel.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, ACTIVITY_LEVELS));
-        if (actvWorkoutType != null) actvWorkoutType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, WORKOUT_TYPES));
-        if (actvCity != null) actvCity.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, CITIES));
-        if (actvCountry != null) actvCountry.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, COUNTRIES));
+        if (actvFitnessGoal != null)
+            actvFitnessGoal.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, GOALS));
+        if (actvActivityLevel != null)
+            actvActivityLevel.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, ACTIVITY_LEVELS));
+        if (actvWorkoutType != null)
+            actvWorkoutType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, WORKOUT_TYPES));
+        if (actvCity != null)
+            actvCity.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, CITIES));
+        if (actvCountry != null)
+            actvCountry.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, COUNTRIES));
     }
 
     private void showDatePicker() {
@@ -415,13 +435,25 @@ public class ProfileFragment extends Fragment {
         datePicker.show(getChildFragmentManager(), "DOB_PICKER");
     }
 
-    private void hideBottomNav() { if (getActivity() != null) { View nav = getActivity().findViewById(R.id.bottom_navigation); if (nav != null) nav.setVisibility(View.GONE); } }
-    private void showBottomNav() { if (getActivity() != null) { View nav = getActivity().findViewById(R.id.bottom_navigation); if (nav != null) nav.setVisibility(View.VISIBLE); } }
+    private void hideBottomNav() {
+        if (getActivity() != null) {
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            if (nav != null) nav.setVisibility(View.GONE);
+        }
+    }
+
+    private void showBottomNav() {
+        if (getActivity() != null) {
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            if (nav != null) nav.setVisibility(View.VISIBLE);
+        }
+    }
 
     private void registerPhotoPickerLauncher() {
         photoPickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                if (ivAvatar != null) Glide.with(requireContext()).load(result.getData().getData()).circleCrop().into(ivAvatar);
+                if (ivAvatar != null)
+                    Glide.with(requireContext()).load(result.getData().getData()).circleCrop().into(ivAvatar);
             }
         });
     }
@@ -442,7 +474,8 @@ public class ProfileFragment extends Fragment {
     private void setupNavigation(View view) {
         // Back Button
         View btnBack = view.findViewById(R.id.btnBack);
-        if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+        if (btnBack != null)
+            btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         // Settings Buttons
         View btnOpenSettings = view.findViewById(R.id.btnOpenSettings);
@@ -450,7 +483,7 @@ public class ProfileFragment extends Fragment {
 
         View.OnClickListener navigateToSettings = v -> {
             try {
-                // Ensure this ID matches the destination ID in your nav_graph.xml
+                // Ensure this ID matches
                 Navigation.findNavController(v).navigate(R.id.nav_settings);
             } catch (IllegalArgumentException e) {
                 Snackbar.make(view, "Settings routing not configured yet.", Snackbar.LENGTH_SHORT).show();
@@ -461,5 +494,7 @@ public class ProfileFragment extends Fragment {
         if (cardGoToSettings != null) cardGoToSettings.setOnClickListener(navigateToSettings);
     }
 
-    public static ProfileFragment newInstance() { return new ProfileFragment(); }
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
+    }
 }

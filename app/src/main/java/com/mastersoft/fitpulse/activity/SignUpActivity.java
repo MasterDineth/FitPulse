@@ -50,36 +50,39 @@ public class SignUpActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    // ── View Binding ──────────────────────────────────────────────────────────
 
     private void bindViews() {
-        tilUsername        = findViewById(R.id.tilUsername);
-        tilEmail           = findViewById(R.id.tilEmail);
-        tilMobile          = findViewById(R.id.tilMobile);
-        tilPassword        = findViewById(R.id.tilPassword);
+        tilUsername = findViewById(R.id.tilUsername);
+        tilEmail = findViewById(R.id.tilEmail);
+        tilMobile = findViewById(R.id.tilMobile);
+        tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
-        etUsername        = findViewById(R.id.etUsername);
-        etEmail           = findViewById(R.id.etEmail);
-        etMobile          = findViewById(R.id.etMobile);
-        etPassword        = findViewById(R.id.etPassword);
+        etUsername = findViewById(R.id.etUsername);
+        etEmail = findViewById(R.id.etEmail);
+        etMobile = findViewById(R.id.etMobile);
+        etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        signUpProgress          = findViewById(R.id.signUpProgress);
-        layoutPasswordStrength  = findViewById(R.id.layoutPasswordStrength);
-        strengthBar1            = findViewById(R.id.strengthBar1);
-        strengthBar2            = findViewById(R.id.strengthBar2);
-        strengthBar3            = findViewById(R.id.strengthBar3);
-        strengthBar4            = findViewById(R.id.strengthBar4);
+        signUpProgress = findViewById(R.id.signUpProgress);
+        layoutPasswordStrength = findViewById(R.id.layoutPasswordStrength);
+        strengthBar1 = findViewById(R.id.strengthBar1);
+        strengthBar2 = findViewById(R.id.strengthBar2);
+        strengthBar3 = findViewById(R.id.strengthBar3);
+        strengthBar4 = findViewById(R.id.strengthBar4);
         tvPasswordStrengthLabel = findViewById(R.id.tvPasswordStrengthLabel);
     }
 
-    // ── Password Strength ─────────────────────────────────────────────────────
+    // Password Strength
 
     private void setupPasswordStrengthWatcher() {
         etPassword.addTextChangedListener(new TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            public void onTextChanged(CharSequence s, int st, int b, int c) {}
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
+            }
+
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+            }
+
             public void afterTextChanged(Editable s) {
                 String pw = s.toString();
                 if (pw.isEmpty()) {
@@ -92,13 +95,13 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    /** Returns 1-4 based on password complexity. */
+
     private int calculateStrength(String password) {
         int score = 0;
-        if (password.length() >= 8)                              score++;
-        if (password.matches(".*[A-Z].*"))                       score++;
-        if (password.matches(".*[0-9].*"))                       score++;
-        if (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{}].*"))  score++;
+        if (password.length() >= 8) score++;
+        if (password.matches(".*[A-Z].*")) score++;
+        if (password.matches(".*[0-9].*")) score++;
+        if (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{}].*")) score++;
         return Math.max(1, score);
     }
 
@@ -121,20 +124,18 @@ public class SignUpActivity extends AppCompatActivity {
         tvPasswordStrengthLabel.setTextColor(ContextCompat.getColor(this, colors[strength - 1]));
     }
 
-    // ── Click Listeners ───────────────────────────────────────────────────────
 
     private void setupClickListeners() {
         // Create Account
         findViewById(R.id.btnCreateAccount).setOnClickListener(v -> attemptSignUp());
 
-        // Back to Sign In
         findViewById(R.id.tvGoToSignIn).setOnClickListener(v -> {
-            finish(); // pops back to SignInActivity
+            finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
     }
 
-    // ── Sign-up Logic ─────────────────────────────────────────────────────────
+    //Signup
 
     private void attemptSignUp() {
         // Clear previous errors
@@ -144,11 +145,11 @@ public class SignUpActivity extends AppCompatActivity {
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
 
-        String username  = getText(etUsername);
-        String email     = getText(etEmail);
-        String mobile    = getText(etMobile);
-        String password  = getText(etPassword);
-        String confirm   = getText(etConfirmPassword);
+        String username = getText(etUsername);
+        String email = getText(etEmail);
+        String mobile = getText(etMobile);
+        String password = getText(etPassword);
+        String confirm = getText(etConfirmPassword);
 
         // Validation
         if (TextUtils.isEmpty(username)) {
@@ -197,7 +198,6 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        // Show loading state
         setLoadingState(true);
 
         // Firebase User Registration
@@ -240,9 +240,7 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
-    /** Shows a success dialog then navigates back to Sign In. */
     private void showSuccessAndRedirect(String email) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Account Created!")

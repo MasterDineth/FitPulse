@@ -16,35 +16,26 @@ import com.mastersoft.fitpulse.model.WorkoutSession;
 
 import java.util.List;
 
-/**
- * RecyclerView adapter for the Workout History list on HomeFragment.
- *
- * Each row uses {@code R.layout.item_workout_history} and displays:
- *   - Workout icon  (type-based drawable)
- *   - Workout name
- *   - Date          (formatted dd/MM/yy)
- *   - Duration      (e.g. "45 min")
- */
+
 public class WorkoutHistoryAdapter
         extends RecyclerView.Adapter<WorkoutHistoryAdapter.ViewHolder> {
 
-    // ── Callback ──────────────────────────────────────────────────────────────
+
     public interface OnItemClickListener {
         void onItemClick(WorkoutSession session);
     }
 
-    // ── Fields ────────────────────────────────────────────────────────────────
-    private final List<WorkoutSession> sessions;
-    private final OnItemClickListener  listener;
 
-    // ── Constructor ───────────────────────────────────────────────────────────
+    private final List<WorkoutSession> sessions;
+    private final OnItemClickListener listener;
+
+
     public WorkoutHistoryAdapter(List<WorkoutSession> sessions,
-                                 OnItemClickListener  listener) {
+                                 OnItemClickListener listener) {
         this.sessions = sessions;
         this.listener = listener;
     }
 
-    // ── RecyclerView.Adapter ──────────────────────────────────────────────────
 
     @NonNull
     @Override
@@ -64,42 +55,39 @@ public class WorkoutHistoryAdapter
         return sessions == null ? 0 : sessions.size();
     }
 
-    // ── Update helper ─────────────────────────────────────────────────────────
 
-    /** Replaces the data set and triggers a full rebind. */
     public void submitList(List<WorkoutSession> newSessions) {
         sessions.clear();
         sessions.addAll(newSessions);
         notifyDataSetChanged();
     }
 
-    // ── ViewHolder ────────────────────────────────────────────────────────────
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final ShapeableImageView ivIcon;
-        private final TextView           tvName;
-        private final TextView           tvDate;
-        private final TextView           tvDuration;
+        private final TextView tvName;
+        private final TextView tvDate;
+        private final TextView tvDuration;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivIcon     = itemView.findViewById(R.id.ivWorkoutIcon);
-            tvName     = itemView.findViewById(R.id.tvWorkoutName);
-            tvDate     = itemView.findViewById(R.id.tvWorkoutDate);
+            ivIcon = itemView.findViewById(R.id.ivWorkoutIcon);
+            tvName = itemView.findViewById(R.id.tvWorkoutName);
+            tvDate = itemView.findViewById(R.id.tvWorkoutDate);
             tvDuration = itemView.findViewById(R.id.tvWorkoutDuration);
         }
 
         void bind(WorkoutSession session, OnItemClickListener listener) {
             // Text fields
-            if (tvName     != null) tvName.setText(session.getName());
-            if (tvDate     != null) tvDate.setText(session.getFormattedDate());
+            if (tvName != null) tvName.setText(session.getName());
+            if (tvDate != null) tvDate.setText(session.getFormattedDate());
             if (tvDuration != null) tvDuration.setText(session.getDurationMin() + " min");
 
-            // Dynamic icon + background based on workout type
-            Context ctx       = itemView.getContext();
-            Resources res     = ctx.getResources();
-            String    pkg     = ctx.getPackageName();
+            // Dynamic icon
+            Context ctx = itemView.getContext();
+            Resources res = ctx.getResources();
+            String pkg = ctx.getPackageName();
 
             if (ivIcon != null) {
                 int iconResId = res.getIdentifier(

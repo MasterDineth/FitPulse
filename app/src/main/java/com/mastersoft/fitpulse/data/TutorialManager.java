@@ -21,7 +21,6 @@ public class TutorialManager {
     private static TutorialManager instance;
     private List<Tutorial> allTutorials;
 
-    // Private constructor to prevent multiple instances
     private TutorialManager() {
         allTutorials = new ArrayList<>();
     }
@@ -33,19 +32,16 @@ public class TutorialManager {
         return instance;
     }
 
-    /**
-     * Call this once (e.g., in MainActivity or SplashActivity) to load the data.
-     */
     public void initialize(Context context) {
         initLocalDataFile(context);
         loadLocalData(context);
     }
 
     public List<Tutorial> getAllTutorials() {
-        return new ArrayList<>(allTutorials); // Return a copy to protect original data
+        return new ArrayList<>(allTutorials);
     }
 
-    // Example of a helper method you can use anywhere!
+
     public List<Tutorial> getTutorialsByLevel(String level) {
         List<Tutorial> filtered = new ArrayList<>();
         for (Tutorial t : allTutorials) {
@@ -108,7 +104,8 @@ public class TutorialManager {
         File file = new File(context.getFilesDir(), FILE_NAME);
         if (file.exists()) {
             try (FileReader reader = new FileReader(file)) {
-                Type type = new TypeToken<ArrayList<Tutorial>>() {}.getType();
+                Type type = new TypeToken<ArrayList<Tutorial>>() {
+                }.getType();
                 allTutorials = new Gson().fromJson(reader, type);
             } catch (IOException e) {
                 Log.e("TutorialManager", "Error reading local file", e);

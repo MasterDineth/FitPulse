@@ -20,10 +20,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.mastersoft.fitpulse.R;
 
 
-
 public class SignInActivity extends AppCompatActivity {
 
-    private TextInputLayout   tilEmail, tilPassword;
+    private TextInputLayout tilEmail, tilPassword;
     private TextInputEditText etEmail, etPassword;
     private LinearProgressIndicator signInProgress;
 
@@ -43,27 +42,25 @@ public class SignInActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    // ── View binding ──────────────────────────────────────────────────────────
 
     private void bindViews() {
-        tilEmail       = findViewById(R.id.tilEmail);
-        tilPassword    = findViewById(R.id.tilPassword);
-        etEmail        = findViewById(R.id.etEmail);
-        etPassword     = findViewById(R.id.etPassword);
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPassword = findViewById(R.id.tilPassword);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
         signInProgress = findViewById(R.id.signInProgress);
     }
 
-    // ── Entrance animations ───────────────────────────────────────────────────
 
     private void setupEntranceAnimations() {
         // Blob fade-in
         View blobTL = findViewById(R.id.blobTopLeft);
         View blobBR = findViewById(R.id.blobBottomRight);
         if (blobTL != null) blobTL.animate().alpha(0.45f).setDuration(800).start();
-        if (blobBR != null) blobBR.animate().alpha(0.35f).setDuration(900).setStartDelay(100).start();
+        if (blobBR != null)
+            blobBR.animate().alpha(0.35f).setDuration(900).setStartDelay(100).start();
     }
 
-    // ── Click listeners ───────────────────────────────────────────────────────
 
     private void setupClickListeners() {
 
@@ -79,14 +76,14 @@ public class SignInActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SignUpActivity.class)));
     }
 
-    // sign-in logic
+    // sign-in
 
     private void attemptSignIn() {
         // Clear previous errors
         tilEmail.setError(null);
         tilPassword.setError(null);
 
-        String email    = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
         String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
 
         // Validation
@@ -110,17 +107,14 @@ public class SignInActivity extends AppCompatActivity {
             tilPassword.requestFocus();
             return;
         }
-
-        // Show loading
         setLoadingState(true);
 
-        // TODO: replace with real auth call (Firebase Auth / your backend)
         // Firebase Auth Sign In
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     setLoadingState(false);
                     if (task.isSuccessful()) {
-                        // On success — navigate to MainActivity and clear back stack
+                        // nnavigate to MainActivity
 
                         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -134,7 +128,7 @@ public class SignInActivity extends AppCompatActivity {
                         startActivity(intent);
                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     } else {
-                        // If sign in fails, display a message to the user
+                        // display a message to the user
                         String errorMsg = task.getException() != null ? task.getException().getMessage() : "Authentication failed";
                         android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_LONG).show();
                     }
