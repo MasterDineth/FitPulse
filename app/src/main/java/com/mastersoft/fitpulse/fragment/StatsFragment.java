@@ -35,17 +35,16 @@ public class StatsFragment extends Fragment {
     private String userId;
     private SharedPreferences stepPrefs;
 
-    // Daily Goals
+
     private static final int GOAL_STEPS = 10000;
     private static final int GOAL_CALORIES = 700;
     private static final int GOAL_ACTIVE_MINS = 60;
     private static final double GOAL_DISTANCE = 7.6; // Approx 10k steps in km
 
-    // Views - Stats
+
     private TextView tvStepsValue, tvCaloriesValue, tvActiveTime, tvDistance;
     private LinearProgressIndicator progressSteps, progressCalories, progressActiveTime, progressDistance;
 
-    // Views - Health
     private TextView tvWeight, tvHeight, tvBmi, tvBodyFat;
 
     @Override
@@ -69,7 +68,7 @@ public class StatsFragment extends Fragment {
         bindViews(view);
         setupToolbar(view);
 
-        // Feature implementations
+
         loadDailyStats();
         loadHealthData();
         updateWeeklyGraph(view);
@@ -82,43 +81,43 @@ public class StatsFragment extends Fragment {
     }
 
     private void bindViews(View v) {
-        // Text Values
+
         tvStepsValue = v.findViewById(R.id.tvStepsValue);
         tvCaloriesValue = v.findViewById(R.id.tvCaloriesValue);
         tvActiveTime = v.findViewById(R.id.tvActiveTime);
         tvDistance = v.findViewById(R.id.tvDistance);
 
-        // Progress Indicators
+
         progressSteps = v.findViewById(R.id.progressSteps);
         progressCalories = v.findViewById(R.id.progressCalories);
         progressActiveTime = v.findViewById(R.id.progressActiveTime);
         progressDistance = v.findViewById(R.id.progressDistance);
 
-        // Health
+
         tvWeight = v.findViewById(R.id.tvWeight);
         tvHeight = v.findViewById(R.id.tvHeight);
         tvBmi = v.findViewById(R.id.tvBmi);
         tvBodyFat = v.findViewById(R.id.tvBodyFat);
     }
 
-    // ── FEATURE 1: DAILY STATS (STEPS + FIREBASE WORKOUTS) ───────────────────
+    // Daily Stats
 
     private void loadDailyStats() {
-        // 1. Get Steps from local storage
+        // Get Steps from local storage
         int steps = stepPrefs.getInt("savedStepsToday", 0);
         if (tvStepsValue != null)
             tvStepsValue.setText(String.format(Locale.getDefault(), "%,d", steps));
         if (progressSteps != null)
             progressSteps.setProgressCompat(Math.min(100, (int) ((steps / (float) GOAL_STEPS) * 100)), true);
 
-        // 2. Calculate Distance (Steps * 0.00076 km average stride)
+        // 2. Calculate Distance
         double distance = steps * 0.00076;
         if (tvDistance != null)
             tvDistance.setText(String.format(Locale.getDefault(), "%.1f", distance));
         if (progressDistance != null)
             progressDistance.setProgressCompat(Math.min(100, (int) ((distance / GOAL_DISTANCE) * 100)), true);
 
-        // 3. Query Firestore for today's specific workout calories and active time
+        // Search Firestore for today's specific workout calories and active time
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -128,8 +127,6 @@ public class StatsFragment extends Fragment {
 
         if (userId == null) return;
 
-        // Query by user ONLY to avoid needing a Composite Index in Firestore.
-        // We filter the dates locally to ensure the query always succeeds.
         db.collection("workoutHistory")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -147,7 +144,7 @@ public class StatsFragment extends Fragment {
                         }
                     }
 
-                    // Total Calories = (Steps * 0.04 factor) + Workout Calories
+                    // Total Calories
                     int totalCalories = (int) ((steps * 0.04) + workoutCalories);
                     int totalActiveTime = (int) activeMinutes;
 
@@ -163,7 +160,7 @@ public class StatsFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e(TAG, "Error fetching workout history", e));
     }
 
-    // ── FEATURE 2: HEALTH DATA & BMI CALCULATION ─────────────────────────────
+    // DAta calculation
 
     private void loadHealthData() {
         if (userId == null) return;
@@ -213,13 +210,11 @@ public class StatsFragment extends Fragment {
         if (tvBmi != null) tvBmi.setText("No data");
     }
 
-    // ── FEATURE 3: WEEKLY STEP GRAPH ─────────────────────────────────────────
 
     private void updateWeeklyGraph(View root) {
-        // Logic for weekly step chart initialization
+        // impliment later
     }
 
-    // ── UTILITIES ────────────────────────────────────────────────────────────
 
     private void setupToolbar(View view) {
         MaterialToolbar toolbar = view.findViewById(R.id.statsToolbar);

@@ -39,18 +39,16 @@ public class ResetPasswordActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    // ── View binding ──────────────────────────────────────────────────────────
 
     private void bindViews() {
-        tilEmail         = findViewById(R.id.tilEmail);
-        etEmail          = findViewById(R.id.etEmail);
-        resetProgress    = findViewById(R.id.resetProgress);
-        cardEmailEntry   = findViewById(R.id.cardEmailEntry);
-        cardSuccess      = findViewById(R.id.cardSuccess);
+        tilEmail = findViewById(R.id.tilEmail);
+        etEmail = findViewById(R.id.etEmail);
+        resetProgress = findViewById(R.id.resetProgress);
+        cardEmailEntry = findViewById(R.id.cardEmailEntry);
+        cardSuccess = findViewById(R.id.cardSuccess);
         tvSuccessMessage = findViewById(R.id.tvSuccessMessage);
     }
 
-    // ── Click listeners ───────────────────────────────────────────────────────
 
     private void setupClickListeners() {
         // Send reset link
@@ -68,7 +66,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             });
         }
 
-        // Back to Sign In
+
         View tvBackToSignIn = findViewById(R.id.tvBackToSignIn);
         if (tvBackToSignIn != null) {
             tvBackToSignIn.setOnClickListener(v -> {
@@ -78,7 +76,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         }
     }
 
-    // ── Reset logic ───────────────────────────────────────────────────────────
+    // pass reset
 
     private void attemptSendResetLink() {
         tilEmail.setError(null);
@@ -112,8 +110,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
                     }
                 });
     }
-
-    // ── State transitions ─────────────────────────────────────────────────────
 
     private void transitionToSuccessState(String email) {
         tvSuccessMessage.setText("Password reset link successfully sent to\n" + email);
@@ -151,7 +147,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 .start();
     }
 
-    // ── Open Email App ────────────────────────────────────────────────────────
+    //Open Email App
 
     private void openEmailApp() {
         Intent emailIntent = new Intent(Intent.ACTION_MAIN);
@@ -175,8 +171,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
             }
         }
     }
-
-    // ── Loading state ─────────────────────────────────────────────────────────
 
     private void setLoadingState(boolean loading) {
         resetProgress.setVisibility(loading ? View.VISIBLE : View.GONE);

@@ -165,22 +165,6 @@ public class PaymentsFragment extends Fragment {
         req.setMerchantId(PAYHERE_MERCHANT_ID);
         req.setCurrency("LKR");
 
-//        req.setAmount(5000);
-//        req.setOrderId("FP-0001");
-//        req.setItemsDescription(" Membership");
-//
-//        // Map data from Firestore user collection
-//        req.getCustomer().setFirstName("Dineth");
-//        req.getCustomer().setLastName("FitPulse");
-//        req.getCustomer().setEmail("guest@fitpulse.lk");
-//        req.getCustomer().setPhone("0771234567");
-//        req.getCustomer().getAddress().setAddress("Colombo");
-//        req.getCustomer().getAddress().setCity("Colombo");
-//        req.getCustomer().getAddress().setCountry("Sri Lanka");
-//        Log.d("TAG", "launchPayhere: " + selectedPlan.getName());
-
-
-
         req.setAmount(selectedPlan.getAmount());
         req.setOrderId(pendingOrderId);
         req.setItemsDescription(selectedPlan.getName() + " Membership");

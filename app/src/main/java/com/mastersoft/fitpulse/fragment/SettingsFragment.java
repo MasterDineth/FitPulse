@@ -1,11 +1,13 @@
 package com.mastersoft.fitpulse.fragment;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -19,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -27,8 +30,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.snackbar.Snackbar;
 import com.mastersoft.fitpulse.R;
+import com.mastersoft.fitpulse.receiver.NotificationReceiver;
+
+import java.util.Calendar;
 
 public class SettingsFragment extends Fragment {
+
+    private static final String CHANNEL_ID = "FITPULSE_CHANNEL";
+    private static final int REQ_WORKOUT = 101;
+    private static final int REQ_CHECKIN = 102;
 
     private MaterialSwitch switchNotifications;
     private MaterialSwitch switchReminders;
@@ -36,10 +46,7 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch switchDarkMode;
     private MaterialSwitch switchAutoSync;
 
-    // Launcher for the POST_NOTIFICATIONS runtime permission (Android 13+)
     private ActivityResultLauncher<String> notificationPermissionLauncher;
-
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +68,7 @@ public class SettingsFragment extends Fragment {
         hideBottomNav();
         bindViews(view);
         setupToolbar(view);
+        createNotificationChannel();
         setupNotificationSwitches();
         setupAppearance();
         setupPrivacyRows(view);
@@ -72,8 +80,6 @@ public class SettingsFragment extends Fragment {
         super.onDestroyView();
         showBottomNav();
     }
-
-    // ── Bottom nav visibility ─────────────────────────────────────────────────
 
     private void hideBottomNav() {
         if (getActivity() != null) {
@@ -89,8 +95,6 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    // ── View binding ──────────────────────────────────────────────────────────
-
     private void bindViews(View view) {
         switchNotifications      = view.findViewById(R.id.switchNotifications);
         switchReminders          = view.findViewById(R.id.switchReminders);
@@ -98,15 +102,10 @@ public class SettingsFragment extends Fragment {
         switchDarkMode           = view.findViewById(R.id.switchDarkMode);
         switchAutoSync           = view.findViewById(R.id.switchAutoSync);
 
-        // Reflect current dark mode state
         int nightMode = AppCompatDelegate.getDefaultNightMode();
         switchDarkMode.setChecked(nightMode == AppCompatDelegate.MODE_NIGHT_YES);
-
-        // Reflect current notification permission state
         switchNotifications.setChecked(areNotificationsEnabled());
     }
-
-    // ── Toolbar ───────────────────────────────────────────────────────────────
 
     private void setupToolbar(View view) {
         MaterialToolbar toolbar = view.findViewById(R.id.settingsToolbar);
@@ -114,7 +113,20 @@ public class SettingsFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack());
     }
 
-    // ── Notification permission launcher ─────────────────────────────────────
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "FitPulse Notifications",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("Reminders and alerts for FitPulse");
+            NotificationManager manager = requireContext().getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+    }
 
     private void registerNotificationPermissionLauncher() {
         notificationPermissionLauncher = registerForActivityResult(
@@ -122,26 +134,20 @@ public class SettingsFragment extends Fragment {
                 granted -> {
                     if (granted) {
                         switchNotifications.setChecked(true);
-                        Snackbar.make(requireView(),
-                                "Notifications enabled", Snackbar.LENGTH_SHORT).show();
+                        sendConfirmationNotification("Push Notifications Enabled", "You will now receive alerts from FitPulse.", 1);
+                        Snackbar.make(requireView(), "Notifications enabled", Snackbar.LENGTH_SHORT).show();
                     } else {
-                        // Permission denied — keep switch off and explain
                         switchNotifications.setChecked(false);
                         showNotificationRationaleDialog();
                     }
                 });
     }
 
-    // ── Notification switches ─────────────────────────────────────────────────
-
     private void setupNotificationSwitches() {
-
-        // Main push notifications switch — requests permission if needed
         switchNotifications.setOnCheckedChangeListener((btn, isChecked) -> {
             if (isChecked) {
                 requestNotificationPermission();
             } else {
-                // User turned off — guide them to system settings to fully disable
                 Snackbar.make(requireView(),
                                 "To fully disable notifications, go to System Settings",
                                 Snackbar.LENGTH_LONG)
@@ -150,111 +156,161 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // Workout reminders sub-switch — only functional if main switch is on
+        // Workout Reminders (Scheduled for 7:00 AM daily)
         switchReminders.setOnCheckedChangeListener((btn, isChecked) -> {
-            if (isChecked && !areNotificationsEnabled()) {
-                btn.setChecked(false);
-                requestNotificationPermission();
+            if (isChecked) {
+                if (!areNotificationsEnabled()) {
+                    btn.setChecked(false);
+                    requestNotificationPermission();
+                    return;
+                }
+                sendConfirmationNotification("Workout Reminders Enabled", "We'll remind you daily to crush your goals.", 2);
+                scheduleDailyReminder(REQ_WORKOUT, "Time to Workout!", "Let's hit the gym and crush your goals for today.", 7, 0);
             } else {
-                // TODO: schedule / cancel AlarmManager for daily workout reminder
+                cancelDailyReminder(REQ_WORKOUT);
             }
         });
 
-        // Check-In reminders sub-switch
+        // Check-In Reminders (Scheduled for 5:30 PM daily)
         switchCheckInReminders.setOnCheckedChangeListener((btn, isChecked) -> {
-            if (isChecked && !areNotificationsEnabled()) {
-                btn.setChecked(false);
-                requestNotificationPermission();
+            if (isChecked) {
+                if (!areNotificationsEnabled()) {
+                    btn.setChecked(false);
+                    requestNotificationPermission();
+                    return;
+                }
+                sendConfirmationNotification("Check-in Reminders Enabled", "We'll remind you to log your gym visits.", 3);
+                scheduleDailyReminder(REQ_CHECKIN, "Did you check in?", "Don't forget to scan your QR code at the gym desk today.", 17, 30);
             } else {
-                // TODO: schedule / cancel check-in notification
+                cancelDailyReminder(REQ_CHECKIN);
             }
         });
     }
 
-    /**
-     * Requests POST_NOTIFICATIONS on Android 13+.
-     * On older Android, notifications are on by default — just enable the channel.
-     */
+    //Scheduling and Sending Notifications
+
+    private void sendConfirmationNotification(String title, String message, int notificationId) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_pulse) // Ensure you have this icon or replace it
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        NotificationManager manager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(notificationId, builder.build());
+        }
+    }
+
+    private void scheduleDailyReminder(int requestCode, String title, String message, int hour, int minute) {
+        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(requireContext(), NotificationReceiver.class);
+        intent.putExtra("title", title);
+        intent.putExtra("message", message);
+        intent.putExtra("notificationId", requestCode);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                requireContext(),
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+
+        // If the time has already passed today, schedule it for tomorrow
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        if (alarmManager != null) {
+              alarmManager.setInexactRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+            );
+        }
+    }
+
+    private void cancelDailyReminder(int requestCode) {
+        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(requireContext(), NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                requireContext(),
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
+        }
+    }
+
+
+
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.POST_NOTIFICATIONS)
-                    == PackageManager.PERMISSION_GRANTED) {
-                // Already granted
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 switchNotifications.setChecked(true);
-            } else if (shouldShowRequestPermissionRationale(
-                    Manifest.permission.POST_NOTIFICATIONS)) {
-                // Show rationale first, then request
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Enable Notifications")
-                        .setMessage("FitPulse needs notification permission to send you " +
-                                "workout reminders and gym check-in alerts.")
-                        .setPositiveButton("Allow", (d, w) ->
-                                notificationPermissionLauncher.launch(
-                                        Manifest.permission.POST_NOTIFICATIONS))
-                        .setNegativeButton("Not now", (d, w) ->
-                                switchNotifications.setChecked(false))
+                        .setMessage("FitPulse needs notification permission to send you workout reminders and gym check-in alerts.")
+                        .setPositiveButton("Allow", (d, w) -> notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS))
+                        .setNegativeButton("Not now", (d, w) -> switchNotifications.setChecked(false))
                         .show();
             } else {
-                // First time or previously denied without rationale
-                notificationPermissionLauncher.launch(
-                        Manifest.permission.POST_NOTIFICATIONS);
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         } else {
-            // Android < 13: notifications allowed by default
             switchNotifications.setChecked(true);
         }
     }
 
-    /** Checks whether the app currently has notification permission / channel enabled. */
     private boolean areNotificationsEnabled() {
-        NotificationManager nm = (NotificationManager)
-                requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
         return nm != null && nm.areNotificationsEnabled();
     }
 
-    /** Shows a dialog explaining how to enable notifications from System Settings. */
     private void showNotificationRationaleDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Permission Denied")
-                .setMessage("You've denied notification permission. To receive workout reminders, " +
-                        "enable notifications for FitPulse in your device settings.")
+                .setMessage("You've denied notification permission. To receive workout reminders, enable notifications for FitPulse in your device settings.")
                 .setPositiveButton("Open Settings", (d, w) -> openAppNotificationSettings())
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    /** Opens the app's notification settings page in the system Settings app. */
     private void openAppNotificationSettings() {
         Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                 .putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
         startActivity(intent);
     }
 
-    // ── Appearance ────────────────────────────────────────────────────────────
 
     private void setupAppearance() {
         switchDarkMode.setOnCheckedChangeListener((btn, isChecked) ->
                 AppCompatDelegate.setDefaultNightMode(
-                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES
-                                : AppCompatDelegate.MODE_NIGHT_NO));
+                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO));
     }
 
-    // ── Privacy & Legal rows ──────────────────────────────────────────────────
-
     private void setupPrivacyRows(View view) {
-        view.findViewById(R.id.rowPrivacyPolicy).setOnClickListener(v -> {
-            // TODO: open WebView or browser intent with privacy policy URL
-        });
-
-        view.findViewById(R.id.rowTerms).setOnClickListener(v -> {
-            // TODO: open Terms of Service
-        });
-
+        view.findViewById(R.id.rowPrivacyPolicy).setOnClickListener(v -> {});
+        view.findViewById(R.id.rowTerms).setOnClickListener(v -> {});
         view.findViewById(R.id.rowAbout).setOnClickListener(v ->
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("FitPulse")
-                        .setMessage("Version 1.0.0\n\nYour fitness, your rhythm.\n\n© 2024 FitPulse")
+                        .setMessage("Version 1.0.0\n\nYour fitness, your rhythm.\n\n2024 FitPulse")
                         .setPositiveButton("OK", null)
                         .show());
 
@@ -265,13 +321,10 @@ public class SettingsFragment extends Fragment {
                     .setItems(languages, (d, which) -> {
                         TextView tvLanguage = view.findViewById(R.id.tvLanguageValue);
                         if (tvLanguage != null) tvLanguage.setText(languages[which]);
-                        // TODO: apply locale change
                     })
                     .show();
         });
     }
-
-    // ── Data & Storage rows ───────────────────────────────────────────────────
 
     private void setupDataRows(View view) {
         view.findViewById(R.id.rowClearCache).setOnClickListener(v ->
@@ -279,17 +332,12 @@ public class SettingsFragment extends Fragment {
                         .setTitle("Clear Cache")
                         .setMessage("This will delete temporary files. Your workout data will not be affected.")
                         .setPositiveButton("Clear", (d, w) ->
-                                Snackbar.make(requireView(), "Cache cleared",
-                                        Snackbar.LENGTH_SHORT).show())
+                                Snackbar.make(requireView(), "Cache cleared", Snackbar.LENGTH_SHORT).show())
                         .setNegativeButton("Cancel", null)
                         .show());
 
-        switchAutoSync.setOnCheckedChangeListener((btn, isChecked) -> {
-            // TODO: toggle background sync worker
-        });
+        switchAutoSync.setOnCheckedChangeListener((btn, isChecked) -> {});
     }
-
-    // ── Factory ───────────────────────────────────────────────────────────────
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();

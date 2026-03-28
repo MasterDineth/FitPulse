@@ -47,18 +47,18 @@ public class TutorialsFragment extends Fragment {
         setupFeaturedCard(view);
         setupSearch(view);
 
-        // 1. Setup RecyclerView with a 2-column grid
+        // Setup RecyclerView with a 2 column grid
         rvTutorials = view.findViewById(R.id.rvTutorials);
         rvTutorials.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         adapter = new TutorialAdapter();
         rvTutorials.setAdapter(adapter);
 
-        // 2. Fetch the data instantly from our global TutorialManager
+        // Fetch the data from our global TutorialManager
         List<Tutorial> tutorials = TutorialManager.getInstance().getAllTutorials();
         adapter.setTutorials(tutorials);
     }
 
-    // ── UI Setup & Listeners ─────────────────────────────────────────────────
+
 
     private void setupSearch(View view) {
         TextInputEditText etSearch = view.findViewById(R.id.etSearch);
@@ -68,7 +68,7 @@ public class TutorialsFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
             public void onTextChanged(CharSequence s, int st, int b, int c) {}
             public void afterTextChanged(Editable s) {
-                // Pass the search query to the adapter
+
                 adapter.filter(s.toString().trim());
             }
         });
@@ -78,7 +78,7 @@ public class TutorialsFragment extends Fragment {
         View cardFeatured = view.findViewById(R.id.cardFeatured);
         View btnWatch     = view.findViewById(R.id.btnWatchFeatured);
 
-        // Default featured workout URL
+
         String featuredUrl = "https://www.youtube.com/results?search_query=full+body+power+workout";
 
         if (cardFeatured != null) cardFeatured.setOnClickListener(v -> openYouTube(featuredUrl));
@@ -90,7 +90,7 @@ public class TutorialsFragment extends Fragment {
         startActivity(intent);
     }
 
-    // ── RecyclerView Adapter ─────────────────────────────────────────────────
+
 
     private class TutorialAdapter extends RecyclerView.Adapter<TutorialAdapter.ViewHolder> {
 
@@ -137,10 +137,10 @@ public class TutorialsFragment extends Fragment {
             holder.tvLevel.setText(tutorial.getLevel());
             holder.tvDuration.setText("▶ " + tutorial.getDuration());
 
-            // Assign a dynamic aesthetic background color based on position
+            // Assign a dynamic background color
             holder.card.setCardBackgroundColor(Color.parseColor(colors[position % colors.length]));
 
-            // Redirect to YouTube URL on click
+            // Redirect to YouTube url
             holder.card.setOnClickListener(v -> openYouTube(tutorial.getVideoUrl()));
         }
 
@@ -164,7 +164,6 @@ public class TutorialsFragment extends Fragment {
         }
     }
 
-    // ── Utility ──────────────────────────────────────────────────────────────
 
     private void setupToolbar(View view) {
         MaterialToolbar toolbar = view.findViewById(R.id.tutorialsToolbar);
