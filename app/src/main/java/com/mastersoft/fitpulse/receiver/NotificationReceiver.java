@@ -24,7 +24,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         String message = intent.getStringExtra("message");
         int notificationId = intent.getIntExtra("notificationId", 0);
 
-        // Verify permission again to prevent crashes if user revoked it in settings
+        // Verify permission
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return;
         }

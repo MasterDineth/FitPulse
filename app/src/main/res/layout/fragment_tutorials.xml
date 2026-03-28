@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,21 +14,21 @@
         android:paddingTop="20dp"
         android:paddingBottom="100dp">
 
-        <!-- ── Toolbar ────────────────────────────────────────────────── -->
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tutorialsToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:layout_marginBottom="16dp"
             android:background="?attr/colorSurface"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="?attr/colorOnSurface"
-            app:title="Tutorials"
             app:subtitle="Learn the right technique"
+            app:title="Tutorials"
             app:titleTextAppearance="?attr/textAppearanceHeadlineMedium"
-            app:titleTextColor="?attr/colorOnSurface"
-            android:layout_marginBottom="16dp" />
+            app:titleTextColor="?attr/colorOnSurface" />
 
-        <!-- ── Search bar ─────────────────────────────────────────────── -->
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSearch"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -37,40 +36,40 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:hint="Search workouts..."
-            app:startIconDrawable="@drawable/ic_search"
-            app:startIconTint="?attr/colorOnSurfaceVariant"
-            app:boxCornerRadiusTopStart="28dp"
-            app:boxCornerRadiusTopEnd="28dp"
-            app:boxCornerRadiusBottomStart="28dp"
+            app:boxBackgroundColor="?attr/colorSurfaceContainerLow"
             app:boxCornerRadiusBottomEnd="28dp"
-            app:boxBackgroundColor="?attr/colorSurfaceContainerLow">
+            app:boxCornerRadiusBottomStart="28dp"
+            app:boxCornerRadiusTopEnd="28dp"
+            app:boxCornerRadiusTopStart="28dp"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSearch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:imeOptions="actionSearch" />
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- ── Featured Card ──────────────────────────────────────────── -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardFeatured"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardBackgroundColor="#7B3F6E"
-            app:cardElevation="0dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            app:cardBackgroundColor="#7B3F6E"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="20dp"
-                android:gravity="center_vertical">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -81,10 +80,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="⭐ Featured"
                         android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="#FFF8E1"
-                        android:layout_marginBottom="4dp" />
+                        android:textColor="#FFF8E1" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -97,18 +96,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
                         android:text="Advanced · 35 min"
                         android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="#CCffffff"
-                        android:layout_marginBottom="14dp" />
+                        android:textColor="#CCffffff" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnWatchFeatured"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Watch Now"
                         android:backgroundTint="@android:color/white"
+                        android:text="Watch Now"
                         android:textColor="#7B3F6E"
                         app:cornerRadius="12dp" />
                 </LinearLayout>
@@ -116,21 +115,20 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:text="🏆"
-                    android:textSize="52sp"
-                    android:layout_marginStart="12dp" />
+                    android:textSize="52sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ── Tutorial Grid (2-column) ───────────────────────────────── -->
 
         <!-- Row 1 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvTutorials"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

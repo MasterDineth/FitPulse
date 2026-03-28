@@ -15,9 +15,23 @@ public class Tutorial {
         this.videoUrl = videoUrl;
     }
 
-    public String getTitle() { return title; }
-    public String getLevel() { return level; }
-    public String getDuration() { return duration; }
-    public String getEmoji() { return emoji; }
-    public String getVideoUrl() { return videoUrl; }
+    public String getTitle() {
+        return title;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
 }
